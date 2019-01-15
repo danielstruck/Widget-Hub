@@ -1,25 +1,24 @@
 package com.WidgetHub.widget;
 
-import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JOptionPane;
 
 public class EscapeCloseAdapter extends KeyAdapter {
-	private Component component;
+	private AbstractWidget widget;
 	
-	public EscapeCloseAdapter(Component component) {
-		this.component = component;
+	public EscapeCloseAdapter(AbstractWidget widget) {
+		this.widget = widget;
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
-		case KeyEvent.VK_ESCAPE:
-			if (JOptionPane.showConfirmDialog(component, "Confirm close?") == JOptionPane.OK_OPTION)
-				System.exit(0);
-		break;
+			case KeyEvent.VK_ESCAPE:
+				if (JOptionPane.showConfirmDialog(widget, "Confirm close?") == JOptionPane.OK_OPTION)
+					widget.close();
+			break;
 		}
 	}
 }

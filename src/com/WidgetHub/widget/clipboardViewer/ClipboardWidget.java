@@ -36,6 +36,12 @@ import javax.swing.JPanel;
 import com.WidgetHub.widget.AbstractWidget;
 import com.WidgetHub.widget.WidgetResizer;
 
+/**
+ * A widget to view and save clipboard data. Useful for multitasking!
+ * 
+ * @author Daniel Struck
+ *
+ */
 public class ClipboardWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 	
@@ -62,6 +68,8 @@ public class ClipboardWidget extends AbstractWidget {
 	
 	public ClipboardWidget() {
 		super(isTransparent, updateDelay, iconPath);
+		
+		setTitle("Clipboard Widget");
 
 		clipboards = new ArrayList<SavableClipboard>();
 		infoHeight = 0;
@@ -77,7 +85,6 @@ public class ClipboardWidget extends AbstractWidget {
 		setBackground(new Color(80, 80, 80));
 		
 		setJMenuBar(menubar(this));
-		System.out.println(getJMenuBar() != null);
 		
 		panel.addMouseWheelListener(new MouseWheelListener() {
 			
@@ -226,7 +233,6 @@ public class ClipboardWidget extends AbstractWidget {
 	}
 	
 	
-	
 	public JMenuBar menubar(JFrame frame) {
 		ClipboardWidget widget = this;
 		
@@ -264,18 +270,14 @@ public class ClipboardWidget extends AbstractWidget {
 					try {
 						SavableClipboard.Factory factory = new SavableClipboard.Factory();
 						
-						if (stringFlavor) {
+						if (stringFlavor)
 							factory.setText((String) c.getData(DataFlavor.stringFlavor));
-						}
-						if (imageFlavor) {
+						if (imageFlavor)
 							factory.setImage((Image) c.getData(DataFlavor.imageFlavor));
-						}
-						if (javaFileListFlavor) {
+						if (javaFileListFlavor)
 							factory.setFiles((List<File>) c.getData(DataFlavor.javaFileListFlavor));
-						}
-//						else {
+//						else
 //							JOptionPane.showMessageDialog(frame, "Clipboard data type is unrecognized: ");// + lastDataType.getClass().getName());
-//						}
 						
 						clipboards.add(factory.instantiate());
 					} catch (Exception e) {
@@ -334,7 +336,6 @@ public class ClipboardWidget extends AbstractWidget {
 						}).start();
 						
 						if (JOptionPane.showConfirmDialog(widget, p, "Clipboard Selector", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-							// TODO copy to user clipboard
 							SavableClipboard clip = clipboards.get(clipboardIndexBox.getSelectedIndex());
 							
 							StringSelection ss = new StringSelection(clip.text);
@@ -359,7 +360,7 @@ public class ClipboardWidget extends AbstractWidget {
 		menuBar.add(
 			menu("Options", 
 				item("Exit", (action) -> {
-					System.exit(0);
+					widget.close();
 				}) // exit
 			)
 		);

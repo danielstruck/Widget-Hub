@@ -2,18 +2,17 @@ package com.WidgetHub.widget.memory;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import com.WidgetHub.widget.AbstractWidget;
 
+/**
+ * A simple memory game. Improve your memory!
+ * 
+ * @author Daniel Struck
+ *
+ */
 public class MemoryGameWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 	
@@ -40,7 +39,7 @@ public class MemoryGameWidget extends AbstractWidget {
 		super(isTransparent, updateDelay, iconPath);
 		gameStarted = false;
 		
-		setName("Memory Game");
+		setName("Memory Game Widget");
 		setBackground(Color.lightGray);
 		setSize(200, 20);
 		setResizable(false);
@@ -110,6 +109,7 @@ public class MemoryGameWidget extends AbstractWidget {
 	private int compareInput(String input, String code) {
 		int maxIndex = Math.min(input.length(), code.length());
 		int numMatching = 0;
+		
 		for (int i = 0; i < maxIndex; i++)
 			if (input.charAt(i) == code.charAt(i)) numMatching++;
 		
@@ -119,7 +119,8 @@ public class MemoryGameWidget extends AbstractWidget {
 	
 	@Override
 	public void render(Graphics g) {
-		g.drawString(infoLabel, 2, 15);
+		if (infoLabel != null)
+			g.drawString(infoLabel, 2, 15);
 	}
 }
 

@@ -21,6 +21,12 @@ import javax.swing.JSeparator;
 
 import com.WidgetHub.widget.AbstractWidget;
 
+/**
+ * Simple timer widget that can keep track of multiple timers. Geared toward accounting.
+ * 
+ * @author Daniel
+ *
+ */
 public class TimerWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 	
@@ -36,6 +42,7 @@ public class TimerWidget extends AbstractWidget {
 
 	public TimerWidget() {
 		super(isTransparent, updateDelay, iconPath);
+		setTitle("Timer Widget");
 		
 		try {
 			setup();
@@ -48,10 +55,10 @@ public class TimerWidget extends AbstractWidget {
 			}
 			catch (FileNotFoundException e1) {
 				JOptionPane.showMessageDialog(null, "Unable to create error log.", "Error durring operation", JOptionPane.ERROR_MESSAGE);
-				System.exit(1);
+				close();
 			}
 			JOptionPane.showMessageDialog(null, "Error data has been logged. \nSee file on desktop for more information.", "Error durring operation", JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
+			close();
 		}
 	}
 	private void setup() throws Exception {
@@ -195,6 +202,7 @@ public class TimerWidget extends AbstractWidget {
 			String s1 = "Are you sure you want to exit Multi Stopwatch?\nData is not saved and will be lost.";
 			if (JOptionPane.showConfirmDialog(this, s1, "Exit Multi Stopwatch", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 				int closeDisp = Math.max(this.getHeight() / 350, 1);
+				
 				while (this.getHeight() > 0) {
 					try {
 						Thread.sleep(1);
@@ -204,7 +212,8 @@ public class TimerWidget extends AbstractWidget {
 					}
 					this.setSize(this.getWidth(), this.getHeight() - closeDisp);
 				}
-				System.exit(0);
+				
+				close();
 			}
 		});
 		JMenuItem cushion = generateMenuOption("Change Cushion", (e) -> {

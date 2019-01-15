@@ -10,6 +10,12 @@ import java.time.format.DateTimeFormatter;
 import com.WidgetHub.widget.AbstractWidget;
 import com.WidgetHub.widget.EscapeCloseAdapter;
 
+/**
+ * Simple clock widget with transparent background. Includes a date counter!
+ * 
+ * @author Daniel Struck
+ *
+ */
 public class ClockWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 	
@@ -26,6 +32,8 @@ public class ClockWidget extends AbstractWidget {
 
 	public ClockWidget() {
 		super(isTransparent, updateDelay, iconPath);
+		
+		setTitle("Clock Widget");
 		setSize(7 * SIZE, SIZE);
 		panel.setCursor(new Cursor(Cursor.MOVE_CURSOR));
 		

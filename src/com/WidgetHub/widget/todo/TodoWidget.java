@@ -21,6 +21,12 @@ import javax.swing.JOptionPane;
 
 import com.WidgetHub.widget.AbstractWidget;
 
+/**
+ * Simple virtual todo list with transparent background.
+ * 
+ * @author Daniel
+ *
+ */
 public class TodoWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 	
@@ -47,6 +53,7 @@ public class TodoWidget extends AbstractWidget {
 	public TodoWidget() {
 		super(isTransparent, updateDelay, iconPath);
 		
+		setTitle("Todo Widget");
 		resizeTo(START_SIZE);
 		
 		spacing = 3;

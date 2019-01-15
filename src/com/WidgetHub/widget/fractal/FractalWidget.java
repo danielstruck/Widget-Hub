@@ -6,6 +6,12 @@ import com.WidgetHub.widget.AbstractWidget;
 import com.WidgetHub.widget.fractal.explorer.Fractal;
 import com.WidgetHub.widget.fractal.view.FractalExplorer;
 
+/**
+ * An import of a fractal explorer application.
+ * 
+ * @author Daniel Struck
+ *
+ */
 public class FractalWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 
