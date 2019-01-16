@@ -133,14 +133,14 @@ public class TodoEvent extends TodoElement {
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		
 		int row = 0;
-		addBagLine(constraints, 0, row++, p, "Preview", previewPanel);
-		addBagLine(constraints, 0, row++, p, "Year", yearSpinner);
-		addBagLine(constraints, 0, row++, p, "Month", monthBox);
-		addBagLine(constraints, 0, row++, p, "Day", dayOfMonthBox);
-		addBagLine(constraints, 0, row++, p, "Hour", hourText);
-		addBagLine(constraints, 0, row++, p, "Minute", minuteText);
-		addBagLine(constraints, 0, row++, p, "Location", locationText);
-		addBagLine(constraints, 0, row++, p, "Details", detailsText);
+		addBagLine(constraints, row++, p, "Preview",  previewPanel);
+		addBagLine(constraints, row++, p, "Year",	  yearSpinner);
+		addBagLine(constraints, row++, p, "Month",	  monthBox);
+		addBagLine(constraints, row++, p, "Day",	  dayOfMonthBox);
+		addBagLine(constraints, row++, p, "Hour",	  hourText);
+		addBagLine(constraints, row++, p, "Minute",	  minuteText);
+		addBagLine(constraints, row++, p, "Location", locationText);
+		addBagLine(constraints, row++, p, "Details",  detailsText);
 		
 		if (!promptOpenFlag) {
 			promptOpenFlag = true;
@@ -192,10 +192,9 @@ public class TodoEvent extends TodoElement {
 			return Integer.parseInt(hour);
 		}
 	}
-	public static void addBagLine(GridBagConstraints constraints, int col, int row, JPanel panel, String label, JComponent component) {
-		col = col * 2;
-		addBagToPanel(constraints, col, row, panel, new JLabel(label));
-		addBagToPanel(constraints, col + 1, row, panel, component);
+	public static void addBagLine(GridBagConstraints constraints, int row, JPanel panel, String label, JComponent component) {
+		addBagToPanel(constraints, 0, row, panel, new JLabel(label));
+		addBagToPanel(constraints, 1, row, panel, component);
 	}
 	public static void addBagToPanel(GridBagConstraints constraints, int x, int y, JPanel panel, JComponent component) {
 		constraints.gridy = y;
@@ -226,9 +225,9 @@ public class TodoEvent extends TodoElement {
 					.addItem((!hasClosed())? "Close": "Un-close", (action) -> {
 						setClosed(!hasClosed());
 					})
-					.addItem("Clean", (action) -> {
-						if (JOptionPane.showConfirmDialog(widget, "Confirm clean? This action is irreversable.") == JOptionPane.OK_OPTION)
-							widget.clean();
+					.addItem("Flush", (action) -> {
+						if (JOptionPane.showConfirmDialog(widget, "Confirm flush? This action is irreversable.") == JOptionPane.OK_OPTION)
+							widget.flush();
 					});
 	}
 	

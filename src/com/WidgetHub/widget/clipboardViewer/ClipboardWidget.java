@@ -268,7 +268,7 @@ public class ClipboardWidget extends AbstractWidget {
 				}), // edit
 				item("Save", (action) -> {
 					try {
-						SavableClipboard.Factory factory = new SavableClipboard.Factory();
+						SavableClipboard.Builder factory = new SavableClipboard.Builder();
 						
 						if (stringFlavor)
 							factory.setText((String) c.getData(DataFlavor.stringFlavor));
@@ -408,28 +408,28 @@ class SavableClipboard {
 		this.files = files;
 	}
 	
-	static class Factory {
+	static class Builder {
 		private String text = null;
 		private Image img = null;
 		private List<File> files = null;
 		
-		public Factory() {
+		public Builder() {
 			text = null;
 			img = null;
 			files = null;
 		}
 		
-		public Factory setText(String text) {
+		public Builder setText(String text) {
 			this.text = text;
 			return this;
 		}
 		
-		public Factory setImage(Image img) {
+		public Builder setImage(Image img) {
 			this.img = img;
 			return this;
 		}
 		
-		public Factory setFiles(List<File> files) {
+		public Builder setFiles(List<File> files) {
 			this.files = files;
 			return this;
 		}

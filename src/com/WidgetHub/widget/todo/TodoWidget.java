@@ -24,7 +24,7 @@ import com.WidgetHub.widget.AbstractWidget;
 /**
  * Simple virtual todo list with transparent background.
  * 
- * @author Daniel
+ * @author Daniel Struck
  *
  */
 public class TodoWidget extends AbstractWidget {
@@ -112,19 +112,16 @@ public class TodoWidget extends AbstractWidget {
 		elementTypes.add(TodoEvent.class);
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-			String[] settings = reader.readLine().split(",");
+			String line = reader.readLine();
 			try {
+				String[] settings = line.split(",");
 				spacing = Integer.parseInt(settings[0]);
 				minimized = Boolean.parseBoolean(settings[1]);
 				resizeTo(Integer.parseInt(settings[2]));
 			} catch (Exception e) {
-				String message = "Failed to read Todo List settings: ";
-				for (String s: settings)
-					message += s + ", ";
-				JOptionPane.showMessageDialog(this, message);
+				JOptionPane.showMessageDialog(this, "Failed to read Todo List settings: " + line);
 			}
 			
-			String line;
 			while ((line = reader.readLine()) != null) {
 				for (Class<? extends TodoElement> type: elementTypes) {
 					if (line.equals(type.getSimpleName())) {
@@ -195,6 +192,8 @@ public class TodoWidget extends AbstractWidget {
 		this.spacing = spacing;
 	}
 	public void resizeTo(int size) {
+		if (size < 100)
+			size = 100;
 		setSize(size, size * 3);
 	}
 	
@@ -202,7 +201,7 @@ public class TodoWidget extends AbstractWidget {
 	/**
 	 * Removes closed elements
 	 */
-	public void clean() {
+	public void flush() {
 		for (int i = elements.size() - 1; i >= 0; i--)
 			if (elements.get(i).hasClosed())
 				elements.remove(i);
@@ -239,8 +238,10 @@ public class TodoWidget extends AbstractWidget {
 		else if (yOffset > scrollMax)
 			yOffset = scrollMax;
 		
-		int yMax = scrollMax + elements.get(elements.size() - 1).getHeight(this.getWidth());
-		setSize(getWidth(), Math.min(getWidth() * 3, yMax - yOffset + 1));
+		if (elements.size() > 0) {
+			int yMax = scrollMax + elements.get(elements.size() - 1).getHeight(this.getWidth());
+			setSize(getWidth(), Math.min(getWidth() * 3, yMax - yOffset + 1));
+		}
 		
 		
 		saveToFile();

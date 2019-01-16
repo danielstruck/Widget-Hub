@@ -24,7 +24,7 @@ import com.WidgetHub.widget.AbstractWidget;
 /**
  * Simple timer widget that can keep track of multiple timers. Geared toward accounting.
  * 
- * @author Daniel
+ * @author Daniel Struck
  *
  */
 public class TimerWidget extends AbstractWidget {

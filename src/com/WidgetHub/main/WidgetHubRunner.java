@@ -7,25 +7,29 @@ import com.WidgetHub.widget.hub.WidgetHub;
 import com.WidgetHub.widget.memory.MemoryGameWidget;
 import com.WidgetHub.widget.timer.TimerWidget;
 import com.WidgetHub.widget.todo.TodoWidget;
-
+/**
+ * 
+ * @author Daniel
+ *
+ */
 public class WidgetHubRunner {
 	// Note: right click menu implementation here - https://stackoverflow.com/questions/766956/how-do-i-create-a-right-click-context-menu-in-java-swing
 	public static void main(String[] args) {
 		System.out.println("HUB START");
 		
-		new ClockWidget();
+//		new ClockWidget();
 
 		new TodoWidget();//.test();
 		
-		new TimerWidget();
+//		new TimerWidget();
 		
-		new FractalWidget();
+//		new FractalWidget();
 		
-		new ClipboardWidget();
+//		new ClipboardWidget();
 		
-		new MemoryGameWidget();
+//		new MemoryGameWidget();
 		
-		new WidgetHub();
+//		new WidgetHub();
 		
 		System.out.println("HUB END");
 	}
