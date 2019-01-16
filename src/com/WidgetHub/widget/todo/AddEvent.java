@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 
 import com.WidgetHub.widget.ContextMenu;
 
+/**
+ * TODO remove parent class TodoEvent from AddEvent
+ */
 public class AddEvent extends TodoEvent {
 	public AddEvent(TodoWidget widget) {
 		super(widget);
@@ -34,7 +37,11 @@ public class AddEvent extends TodoEvent {
 	}
 	@Override
 	public void applyCustomContextMenu(ContextMenu contextMenu) {
-		
+		contextMenu.addItem("Add event", (action) -> {
+						widget.addElement(new TodoEvent(widget));
+					}).addItem("Add repeatable", (action) -> {
+						widget.addElement(new RepeatableTodoEvent(widget));
+					});
 	}
 	
 	@Override
