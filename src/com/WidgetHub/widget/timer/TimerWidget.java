@@ -275,7 +275,6 @@ public class TimerWidget extends AbstractWidget {
 	
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 		
 	}
 	

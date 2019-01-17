@@ -7,11 +7,9 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
 
 import com.WidgetHub.widget.ContextMenu;
+import com.WidgetHub.widget.Toolbox;
 
-/**
- * TODO remove parent class TodoEvent from AddEvent
- */
-public class AddEvent extends TodoEvent {
+public class AddEvent extends TodoElement {
 	public AddEvent(TodoWidget widget) {
 		super(widget);
 		
@@ -24,6 +22,19 @@ public class AddEvent extends TodoEvent {
 	public void onMouseClick(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1)
 			widget.addElement(new TodoEvent(widget));
+	}
+	
+	
+	@Override
+	public int getHeight(int width) {
+		if (widget.isMinimized())
+			return width / 15;
+		else
+			return width / 3;
+	}
+	
+	private int getArcSize(int width) {
+		return width / 10;
 	}
 	
 	
@@ -51,9 +62,18 @@ public class AddEvent extends TodoEvent {
 		drawBackground(g, y, width, height);
 		drawAddEvent(g, y, width, height);
 	}
+	protected void drawBackground(Graphics g, int y, int width, int height) {
+		final int arcSize = getArcSize(width);
+		
+		g.setColor(Color.black);
+		g.fillRoundRect(0, y + 1, width, height, arcSize, arcSize);
+		
+		g.setColor(Color.lightGray);
+		g.fillRoundRect(1, y, width - 1, height - 1, arcSize, arcSize);
+	}
 	protected void drawAddEvent(Graphics g, int y, int width, int height) {
 		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height * 9 / 10));
 		g.setColor(Color.darkGray);
-		drawCenteredString(g, "+", width / 2, y + height / 2);
+		Toolbox.drawCenteredString(g, "+", width / 2, y + height / 2);
 	}
 }

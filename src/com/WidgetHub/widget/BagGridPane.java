@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -27,11 +26,8 @@ public class BagGridPane extends JPanel {
 	}
 	
 	public void addRow(Component ...components) {
-		for (int col = 0; col < components.length; col++) {
-			System.out.println(components[col].getClass().getSimpleName() + " | " + components[col].getName());
+		for (int col = 0; col < components.length; col++)
 			setCell(col, currentRow, components[col]);
-		}
-		System.out.println();
 		
 		currentRow++;
 	}

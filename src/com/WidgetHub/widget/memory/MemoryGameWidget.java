@@ -16,28 +16,43 @@ import com.WidgetHub.widget.AbstractWidget;
 public class MemoryGameWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
 	
-	private final String charsLower = "abcdefghijklmnopqrstuvwxyz", charsUpper = charsLower.toUpperCase(),
-			charsNum = "1234567890";
+	private final String charsLower = "abcdefghijklmnopqrstuvwxyz",
+						 charsUpper = charsLower.toUpperCase(),
+						 charsNum   = "1234567890";
 	
 	// constructor info
 	private static final boolean isTransparent = true;
 	private static final int updateDelay = 10;
 	private static final String iconPath = null;
 	
-	// instance valiables
-	private double codeTime = 60;// in seconds
-	private double codeLength = 1;
-	private double streak = 0;
+	// instance variables
+	private double codeTime_Sec;
+	private double codeLength;
+	private double streak;
 	private String code;
 	private long startTime;
 	private String input;
 	private String infoLabel;
 	private boolean gameStarted;
 	
+	private class CodePromptResults {
+		int tries;
+		int highestCorrect;
+		
+		public CodePromptResults() {
+			tries = 0;
+			highestCorrect = 0;
+		}
+	}
+	
 	
 	public MemoryGameWidget() {
 		super(isTransparent, updateDelay, iconPath);
 		gameStarted = false;
+		
+		codeTime_Sec = 60;
+		codeLength = 1;
+		streak = 0;
 		
 		setName("Memory Game Widget");
 		setBackground(Color.lightGray);
@@ -52,18 +67,18 @@ public class MemoryGameWidget extends AbstractWidget {
 	
 	@Override
 	public void update() {
-		if (gameStarted && System.currentTimeMillis() - startTime >= codeTime * 1000) {
+		if (gameStarted && System.currentTimeMillis() - startTime >= codeTime_Sec * 1000) {
 			CodePromptResults results = promptForCode();
 			
 			double percentCorrect = (double) results.highestCorrect / code.length();
 			
 			streak += percentCorrect;
 			if (results.tries <= 3) {
-				codeTime += 10 * percentCorrect / results.tries + streak;
+				codeTime_Sec += 10 * percentCorrect / results.tries + streak;
 				codeLength += 1.0 / (results.tries * results.tries);
 			}
 			else {
-				codeTime = Math.max(30, codeTime - 10 * 3/percentCorrect);
+				codeTime_Sec = Math.max(30, codeTime_Sec - 10 * 3/percentCorrect);
 				codeLength = Math.max(1, codeLength - 1);
 				
 				streak = 0;
@@ -90,7 +105,7 @@ public class MemoryGameWidget extends AbstractWidget {
 		return results;
 	}
 	private void generateCode() {
-		infoLabel = ((int) codeLength) + " chars every " + ((int) codeTime) + "s | streak: " + ((int) streak);
+		infoLabel = ((int) codeLength) + " chars every " + ((int) codeTime_Sec) + "s | streak: " + ((int) streak);
 		
 		String chars = charsUpper;
 		if (codeLength > 7)
@@ -121,15 +136,5 @@ public class MemoryGameWidget extends AbstractWidget {
 	public void render(Graphics g) {
 		if (infoLabel != null)
 			g.drawString(infoLabel, 2, 15);
-	}
-}
-
-class CodePromptResults {
-	int tries;
-	int highestCorrect;
-	
-	public CodePromptResults() {
-		tries = 0;
-		highestCorrect = 0;
 	}
 }

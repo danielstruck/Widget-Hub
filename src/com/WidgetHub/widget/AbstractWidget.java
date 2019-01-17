@@ -51,11 +51,12 @@ public abstract class AbstractWidget extends JFrame {
 			setUndecorated(true);
 			setBackground(new Color(0, 0, 0, 0));
 			panel.setOpaque(false);
+			
+			dragAdapter = new WidgetDragger(this);
+			panel.addMouseMotionListener(dragAdapter);
+			panel.addMouseListener(dragAdapter);
 		}
 		
-		dragAdapter = new WidgetDragger(this);
-		panel.addMouseMotionListener(dragAdapter);
-		panel.addMouseListener(dragAdapter);
 		
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

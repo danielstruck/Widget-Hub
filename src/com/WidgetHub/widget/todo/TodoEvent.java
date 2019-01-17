@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import com.WidgetHub.widget.BagGridPane;
 import com.WidgetHub.widget.ContextMenu;
 import com.WidgetHub.widget.StringScroller;
+import com.WidgetHub.widget.Toolbox;
 
 public class TodoEvent extends TodoElement {
 	StringScroller location;
@@ -322,14 +323,14 @@ public class TodoEvent extends TodoElement {
 		String formattedDateTime = defaultDateTimeFormat.format(getDateTime());
 		
 		g.setColor(Color.blue);
-		drawCenteredString(g, formattedDateTime, width / 2, dateTimeY);
+		Toolbox.drawCenteredString(g, formattedDateTime, width / 2, dateTimeY);
 	}
 	protected void drawLocation(Graphics g, int y, int width, int height) {
 		final int xOffset = 7;
 		FontMetrics fm = g.getFontMetrics();
 		
 		int yPos = y + height * 5 / 10;
-		yPos += getFontHeight(fm) / 2;
+		yPos += Toolbox.getFontHeight(fm) / 2;
 		
 		g.setColor(Color.black);
 		g.drawString(location.next(fm, width - xOffset), xOffset, yPos);
@@ -339,7 +340,7 @@ public class TodoEvent extends TodoElement {
 		FontMetrics fm = g.getFontMetrics();
 		
 		int yPos  = y + height * 8 / 10;
-		yPos += getFontHeight(fm) / 2;
+		yPos += Toolbox.getFontHeight(fm) / 2;
 		
 		g.setColor(new Color(125, 60, 0));
 		g.drawString(details.next(fm, width - xOffset), xOffset, yPos);
@@ -355,19 +356,5 @@ public class TodoEvent extends TodoElement {
 		tor += details.text + "\n";
 		
 		return tor;
-	}
-	
-	
-	
-	public static void drawCenteredString(Graphics g, String s, int x, int y) {
-		FontMetrics fm = g.getFontMetrics();
-		
-		x -= fm.stringWidth(s) / 2;
-		y += getFontHeight(fm) / 2;
-		
-		g.drawString(s, x, y);
-	}
-	private static int getFontHeight(FontMetrics fm) {
-		return (fm.getAscent() - fm.getDescent() - fm.getLeading());
 	}
 }

@@ -14,21 +14,30 @@ import com.WidgetHub.widget.fractal.view.FractalExplorer;
  */
 public class FractalWidget extends AbstractWidget {
 	private static final long serialVersionUID = 1L;
-
+	private FractalExplorer fractalExplorer;
 
 	public FractalWidget() {
 		Fractal.Julia.n = 2;
 		Fractal.JuliaC.cx = -.7;
 		Fractal.JuliaC.cy = .27015;
 		
-		new FractalExplorer().setFractal(Fractal.JuliaC)
-							 .setImgHeight(50)
-							 .setImgWidth(50)
-							 .setXOffset(0)
-							 .setYOffset(0)
-							 .setZoom(15)
-							 .setResolution(1000)
-							 .setup();
+		fractalExplorer = new FractalExplorer();
+		fractalExplorer.setFractal(Fractal.JuliaC)
+						 .setImgHeight(50)
+						 .setImgWidth(50)
+						 .setXOffset(0)
+						 .setYOffset(0)
+						 .setZoom(15)
+						 .setResolution(1000)
+						 .setup();
+	}
+	
+	
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		fractalExplorer.fractalFrame.setVisible(visible);
+		fractalExplorer.monitor.setVisible(visible);
 	}
 	
 	

@@ -5,7 +5,13 @@ import java.util.function.Predicate;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-
+/**
+ * implements a right click context menu. Methods allow chaining.
+ * 
+ * @author Daniel
+ * 
+ * NOTE: right click menu implementation here - https://stackoverflow.com/questions/766956/how-do-i-create-a-right-click-context-menu-in-java-swing
+ */
 public class ContextMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
 
