@@ -77,8 +77,9 @@ public class RepeatableTodoEvent extends TodoEvent {
 	@Override
 	public void applyCustomContextMenu(ContextMenu contextMenu) {
 		RepeatableTodoEvent event = this;
-		contextMenu.addItem("Dismiss", (action) -> {
-						for (int i = 1; i <= 7; i++) {
+		
+		contextMenu.addItemIf(alertFlag, "Dismiss", (action) -> {
+						for (int i = 0; i < 7; i++) {
 							event.setDateTime(event.getDateTime().plusDays(1));
 							if (event.repeatsOnDay(event.getDateTime().getDayOfWeek())) {
 								event.resetAlerts();

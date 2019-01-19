@@ -1,4 +1,4 @@
-package com.WidgetHub.widget.todo;
+package com.WidgetHub.widget;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -17,10 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
-import com.WidgetHub.widget.BagGridPane;
-import com.WidgetHub.widget.ContextMenu;
-import com.WidgetHub.widget.StringScroller;
-import com.WidgetHub.widget.Toolbox;
+import com.WidgetHub.widget.todo.TodoElement;
+import com.WidgetHub.widget.todo.TodoWidget;
 
 public class TodoEvent extends TodoElement {
 	protected StringScroller location;
@@ -243,11 +241,11 @@ public class TodoEvent extends TodoElement {
 		contextMenu.addItem("Edit", (action) -> {
 						edit();
 					})
-					.addItemIf(alertFlag, "Snooze +5", (action) -> {
+					.addItemIf((input) -> { return input; }, alertFlag, "Snooze +5", (action) -> {
 						setDateTime(LocalDateTime.now().plusMinutes(5));
 						alertFlag = false;
 					})
-					.addItemIf(alertFlag, "Snooze +30", (action) -> {
+					.addItemIf((input) -> { return input; }, alertFlag, "Snooze +30", (action) -> {
 						setDateTime(LocalDateTime.now().plusMinutes(30));
 						alertFlag = false;
 					})
@@ -330,8 +328,8 @@ public class TodoEvent extends TodoElement {
 		
 		int yPos = y + height * 5 / 10;
 		yPos += Toolbox.getFontHeight(fm) / 2;
-
-		g.setColor(new Color(125, 60, 0));
+		
+		g.setColor(Color.black);
 		g.drawString(location.next(fm, width - xOffset), xOffset, yPos);
 	}
 	protected void drawDetails(Graphics g, int y, int width, int height) {
@@ -344,8 +342,8 @@ public class TodoEvent extends TodoElement {
 		else
 			yPos = y + height * 5 / 10;
 		yPos += Toolbox.getFontHeight(fm) / 2;
-
-		g.setColor(Color.black);
+		
+		g.setColor(new Color(125, 60, 0));
 		g.drawString(details.next(fm, width - xOffset), xOffset, yPos);
 	}
 	

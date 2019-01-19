@@ -1,10 +1,9 @@
 package com.WidgetHub.main;
 
 import com.WidgetHub.widget.hub.WidgetHub;
+
 /**
- * 
  * @author Daniel Struck
- *
  */
 public class WidgetHubRunner {
 	public static void main(String[] args) {

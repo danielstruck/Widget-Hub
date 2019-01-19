@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 /**
- * implements a right click context menu. Methods allow chaining.
+ * Implements a right click context menu. Methods allow chaining.
  * 
  * @author Daniel
  * 
@@ -32,7 +32,10 @@ public class ContextMenu extends JPopupMenu {
 		return this;
 	}
 	public <T> ContextMenu addItemIf(Predicate<T> condition, T input, String name, ActionListener action) {
-		if (condition.test(input))
+		return addItemIf(condition.test(input), name, action);
+	}
+	public ContextMenu addItemIf(boolean condition, String name, ActionListener action) {
+		if (condition)
 			addItem(name, action);
 		
 		return this;

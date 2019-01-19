@@ -17,6 +17,8 @@ import com.WidgetHub.widget.memory.MemoryGameWidget;
 import com.WidgetHub.widget.timer.TimerWidget;
 import com.WidgetHub.widget.todo.TodoWidget;
 
+// TODO reduce CPU impact
+
 /**
  * One widget to rule them all. This hub keeps track of active widgets.
  * 
@@ -28,9 +30,10 @@ public class WidgetHub extends AbstractWidget {
 
 	// constructor info
 	private static final boolean isTransparent = false;
-	private static final int updateDelay = 50;
-	private static final String iconPath = null;
+	private static final int updateDelay = 250;
+	private static final String iconPath = null; // TODO make widget hub icon
 	
+	// TODO concatenate widget JFrames together to make 1 JFrame
 	// instance variables
 	private WidgetCheckBox<ClipboardWidget> clipboardCheckBox;
 	private WidgetCheckBox<ClockWidget> clockCheckBox;
@@ -46,10 +49,11 @@ public class WidgetHub extends AbstractWidget {
 		setTitle("Widget Hub");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		 // TODO Widgets sometimes open twice
 		clipboardCheckBox = new WidgetCheckBox<ClipboardWidget>(ClipboardWidget.class);
-		clockCheckBox	  = new WidgetCheckBox<ClockWidget>(ClockWidget.class);
+		clockCheckBox	  = new WidgetCheckBox<ClockWidget>(ClockWidget.class); // TODO ClockWidget sometimes fails to open properly when another widget is open first
 		fractalCheckBox	  = new WidgetCheckBox<FractalWidget>(FractalWidget.class);
-		memoryCheckBox	  = new WidgetCheckBox<MemoryGameWidget>(MemoryGameWidget.class); // TODO memory game opens twice(?)
+		memoryCheckBox	  = new WidgetCheckBox<MemoryGameWidget>(MemoryGameWidget.class);
 		timeCheckBox	  = new WidgetCheckBox<TimerWidget>(TimerWidget.class);
 		todoCheckBox	  = new WidgetCheckBox<TodoWidget>(TodoWidget.class);
 		
@@ -77,6 +81,12 @@ public class WidgetHub extends AbstractWidget {
 	public void render(Graphics g) {
 		
 	}
+	
+	
+	// TODO add functionality for saving the state of the hub; ie: which widget is open, etc
+	
+	
+	// TODO some widgets fail to have their size set properly, resulting in widgets not appearing on the screen
 }
 
 class WidgetCheckBox<Widget_T extends AbstractWidget> extends JCheckBox implements ItemListener {

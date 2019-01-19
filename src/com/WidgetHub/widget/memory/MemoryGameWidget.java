@@ -23,7 +23,7 @@ public class MemoryGameWidget extends AbstractWidget {
 	// constructor info
 	private static final boolean isTransparent = true;
 	private static final int updateDelay = 10;
-	private static final String iconPath = null;
+	private static final String iconPath = null; // TODO make memory game widget icon
 	
 	// instance variables
 	private double codeTime_Sec;

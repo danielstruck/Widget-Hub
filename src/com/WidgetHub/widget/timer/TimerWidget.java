@@ -33,7 +33,7 @@ public class TimerWidget extends AbstractWidget {
 	// constructor info
 	private static final boolean isTransparent = true;
 	private static final int updateDelay = 50;
-	private static final String iconPath = null;
+	private static final String iconPath = null; // TODO make timer widget icon
 	
 	// timer constants
 	public static final ArrayList<CStopWatch> stopwatches = new ArrayList<CStopWatch>();

@@ -16,6 +16,8 @@ import com.WidgetHub.widget.fractal.explorer.Commands;
 import com.WidgetHub.widget.fractal.explorer.FractalInfo;
 
 public class FractalExplorer extends FractalInfo {
+	// TODO combine display frame and monitor into 1 JFrame (maybe make monitor into a JPanel?)
+	// TODO make combined display frame icon (maybe a generated fractal?)
 	public FractalImageDisplay fractalFrame;
 	public MonitorFrame monitor;
 	

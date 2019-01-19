@@ -36,7 +36,7 @@ public class TodoWidget extends AbstractWidget {
 	
 	// settings
 	private static final int START_SIZE = 200;
-	private static final String FILE_PATH = "src/com/WidgetHub/widget/todo/Todo Elements.txt";
+	private static final String FILE_PATH = System.getProperty("user.dir") + "/Todo Elements.txt";
 	
 	// constructor info
 	private static final boolean isTransparent = true;
@@ -110,6 +110,7 @@ public class TodoWidget extends AbstractWidget {
 	private void readInFile() {
 		ArrayList<Class<? extends TodoElement>> elementTypes = new ArrayList<Class<? extends TodoElement>>();
 		elementTypes.add(TodoEvent.class);
+		elementTypes.add(RepeatableTodoEvent.class);
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
 			String line = reader.readLine();

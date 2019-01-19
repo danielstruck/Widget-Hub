@@ -72,7 +72,7 @@ public class AddEvent extends TodoElement {
 		g.fillRoundRect(1, y, width - 1, height - 1, arcSize, arcSize);
 	}
 	protected void drawAddEvent(Graphics g, int y, int width, int height) {
-		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height * 9 / 10));
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height));
 		g.setColor(Color.darkGray);
 		Toolbox.drawCenteredString(g, "+", width / 2, y + height / 2);
 	}

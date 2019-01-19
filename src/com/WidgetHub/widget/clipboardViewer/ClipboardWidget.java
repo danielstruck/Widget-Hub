@@ -48,7 +48,7 @@ public class ClipboardWidget extends AbstractWidget {
 	// constructor info
 	private static final boolean isTransparent = true;
 	private static final int updateDelay = 100;
-	private static final String iconPath = null;
+	private static final String iconPath = null; // TODO make clipboard widget icon
 	
 	// settings
 	private static final int fontSize = 15;
@@ -113,9 +113,6 @@ public class ClipboardWidget extends AbstractWidget {
 	
 	@Override
 	public void render(Graphics g) {
-		g.setColor(new Color(0, 255, 255, 40));
-		g.fillOval(panel.getWidth() - WidgetResizer.DRAG_AREA_SZ, panel.getHeight() - WidgetResizer.DRAG_AREA_SZ, 2*WidgetResizer.DRAG_AREA_SZ, 2*WidgetResizer.DRAG_AREA_SZ);
-		
 		Point pos = new Point(horizBuff, -scroll);
 		boolean handledFlavor = true;
 		handledFlavor &= tryFileFlavor(g, pos);
@@ -125,6 +122,9 @@ public class ClipboardWidget extends AbstractWidget {
 			unhandledFlavor(g, pos);
 		
 		infoHeight = pos.y + scroll;
+		
+		g.setColor(new Color(0, 255, 255, 40));
+		g.fillOval(panel.getWidth() - WidgetResizer.DRAG_AREA_SZ, panel.getHeight() - WidgetResizer.DRAG_AREA_SZ, 2*WidgetResizer.DRAG_AREA_SZ, 2*WidgetResizer.DRAG_AREA_SZ);
 		
 		g.setColor(Color.black);
 		g.drawRect(0, 0, panel.getWidth() - 1, panel.getHeight() - 1);

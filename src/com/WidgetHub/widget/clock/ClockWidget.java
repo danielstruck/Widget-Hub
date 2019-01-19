@@ -27,7 +27,7 @@ public class ClockWidget extends AbstractWidget {
 	// Constructor info
 	private static final int updateDelay = 100;
 	private static final boolean isTransparent = true;
-	private static final String iconPath = "/clock icon.png";
+	private static final String iconPath = "/clock icon-2.png"; // TODO new clock icon needs transparent background
 	
 
 	public ClockWidget() {
