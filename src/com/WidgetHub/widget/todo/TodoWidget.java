@@ -254,14 +254,17 @@ public class TodoWidget extends AbstractWidget {
 	public void render(Graphics g) {
 		int y = -yOffset;
 		
+		render:
 		for (int i = 0; i < elements.size(); i++) {
 			TodoElement element = elements.get(i);
 			int elementHeight = element.getHeight(getWidth());
 			
-			if (y + elementHeight < 0)
+			if (y + elementHeight > 0) {
+				if (y > getHeight())
+					break render;
+				
 				element.render(g, y, panel.getWidth());
-			else if (y > getHeight())
-				break;
+			}
 			
 			y += elementHeight;
 			y += spacing;
