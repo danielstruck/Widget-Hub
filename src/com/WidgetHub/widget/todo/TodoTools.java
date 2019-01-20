@@ -5,8 +5,11 @@ import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 
 import com.WidgetHub.widget.ContextMenu;
+import com.WidgetHub.widget.Tone.Note;
 
 public class TodoTools {
+	private static boolean alertFlag;
+	
 	private TodoTools() {}
 	
 	public static void showContextMenu(MouseEvent event, TodoElement element, TodoWidget widget) {
@@ -45,5 +48,16 @@ public class TodoTools {
 				});
 		
 		contextMenu.show(event.getComponent(), event.getX(), event.getY());
+	}
+
+	
+	public static void alertBeep() {
+		if (!alertFlag) {
+			new Thread(() -> {
+				alertFlag = true;
+				Note.play(100, "A4 B4");
+				alertFlag = false;
+			}).start();
+		}
 	}
 }

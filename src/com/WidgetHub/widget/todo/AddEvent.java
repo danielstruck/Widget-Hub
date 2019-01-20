@@ -43,7 +43,7 @@ public class AddEvent extends TodoElement {
 		/* This element cannot be closed */
 	}
 	@Override
-	public void alert(LocalDateTime now) {
+	public void alert() {
 		/* This element cannot be alerted */
 	}
 	@Override

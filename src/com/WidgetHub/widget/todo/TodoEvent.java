@@ -172,6 +172,7 @@ public class TodoEvent extends TodoElement {
 					
 					todoEvent.resetAlerts();
 				}
+				
 				promptOpenFlag = false;
 			}
 			
@@ -221,8 +222,11 @@ public class TodoEvent extends TodoElement {
 	
 	
 	@Override
-	public void alert(LocalDateTime now) {
-		alertFlag = true;
+	public void alert() {
+		if (alertFlag == false) {
+			alertFlag = true;
+			TodoTools.alertBeep();
+		}
 	}
 	/**
 	 * @return true if alert was reset, false otherwise.

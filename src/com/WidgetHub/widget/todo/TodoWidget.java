@@ -92,6 +92,8 @@ public class TodoWidget extends AbstractWidget {
 			}
 		
 			private TodoElement elementAt(int y) {
+				y += yOffset;
+				
 				for (TodoElement event: elements) {
 					y -= event.getHeight(panel.getWidth());
 					y -= spacing;
@@ -221,11 +223,11 @@ public class TodoWidget extends AbstractWidget {
 		LocalDateTime now = LocalDateTime.now();
 		for (TodoElement elem: elements) {
 			if (elem.getDateTime().compareTo(now) < 0)
-				elem.alert(now);
+				elem.alert();
 			else
 				break;
 		}
-
+		
 	
 		int scrollMax = 0;
 		
@@ -251,10 +253,17 @@ public class TodoWidget extends AbstractWidget {
 	@Override
 	public void render(Graphics g) {
 		int y = -yOffset;
+		
 		for (int i = 0; i < elements.size(); i++) {
 			TodoElement element = elements.get(i);
-			element.render(g, y, panel.getWidth());
-			y += element.getHeight(getWidth());
+			int elementHeight = element.getHeight(getWidth());
+			
+			if (y + elementHeight < 0)
+				element.render(g, y, panel.getWidth());
+			else if (y > getHeight())
+				break;
+			
+			y += elementHeight;
 			y += spacing;
 		}
 		

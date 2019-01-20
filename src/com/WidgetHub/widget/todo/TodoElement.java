@@ -43,8 +43,8 @@ public abstract class TodoElement implements Comparable<TodoElement> {
 	
 	public abstract void render(Graphics g, int y, int width);
 	public abstract int getHeight(int width);
-	public abstract void alert(LocalDateTime now);
 	public abstract void applyCustomContextMenu(ContextMenu contextMenu);
+	public abstract void alert();
 	
 	
 	@Override
