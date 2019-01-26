@@ -16,10 +16,13 @@ public class Tone {
 		
 		private static final SourceDataLine line = generateSourceDataLine();
 		
-		private final byte[] sin = new byte[SECONDS_MAX * SAMPLE_RATE];
+		private static byte VOLUME = 127;
+		
+		private final double[] sin = new double[SECONDS_MAX * SAMPLE_RATE];
+		// TODO add sawtooth, square, etc waves
 		
 		
-		Note() {
+		private Note() {
 			int n = this.ordinal();
 			
 			if (n > 0) {
@@ -29,7 +32,7 @@ public class Tone {
 				for (int i = 0; i < sin.length; i++) {
 					double period = (double) SAMPLE_RATE / frequency;
 					double angle = 2 * i * Math.PI / period;
-					sin[i] = (byte) (Math.sin(angle) * 127);
+					sin[i] = Math.sin(angle);
 				}
 			}
 		}
@@ -43,7 +46,7 @@ public class Tone {
 				millis = Math.min(millis, SECONDS_MAX * 1000);
 				int length = SAMPLE_RATE * millis / 1000;
 				
-				line.write(sin, 0, length);
+				line.write(amplify(sin), 0, length);
 				line.drain();
 				line.close();
 			}
@@ -51,6 +54,14 @@ public class Tone {
 				e.printStackTrace();
 				return;
 			}
+		}
+		private byte[] amplify(double[] values) {
+			byte[] amplified = new byte[values.length];
+			
+			for (int i = 0; i < values.length; i++)
+				amplified[i] = (byte) (values[i] * VOLUME);
+			
+			return amplified;
 		}
 		
 		
@@ -78,6 +89,10 @@ public class Tone {
 			return successes;
 		}
 		
+		public static void setVolume(double volume) {
+			VOLUME = (byte) (127 * Math.max(0, Math.min(volume, 1)));
+		}
+		
 		
 		private static SourceDataLine generateSourceDataLine() {
 			try {
@@ -91,7 +106,9 @@ public class Tone {
 	
 	
 	public static void main(String[] args) {
-		Note.play(100, "A4 B4");
+		Note.setVolume(.9);
+//		Note.play(100, "A4 B4");
+		Note.play(50, "B4 B4 B4");
 		
 //		for (Note note: Note.values()) {
 //			System.out.println(note.name());
