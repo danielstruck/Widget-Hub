@@ -305,12 +305,16 @@ public class TodoEvent extends TodoElement {
 	}
 	protected void drawBackground(Graphics g, int y, int width, int height) {
 		final int arcSize = getArcSize(width);
+		
 		g.setColor(Color.black);
 		g.fillRoundRect(0, y + 1, width, height, arcSize, arcSize);
 		
 		Color c;
+		LocalDateTime now = LocalDateTime.now();
 		if (alertFlag && (System.currentTimeMillis() % 500 > 250))
 			c = Color.red;
+		else if (getDateTime().isBefore(now.plusDays(7)))
+			c = new Color(192 - 50, 192, 192); // light gray w/ cyan tint
 		else
 			c = Color.lightGray;
 		

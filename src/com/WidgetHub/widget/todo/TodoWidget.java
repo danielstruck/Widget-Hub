@@ -48,6 +48,62 @@ public class TodoWidget extends AbstractWidget {
 	private int spacing;
 	private boolean minimized;
 	private int yOffset;
+
+	private enum ClickType { PRESS, CLICK, RELEASE }
+	private class MouseControl extends MouseAdapter {
+		
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			yOffset += e.getWheelRotation() * (panel.getWidth() + spacing) / 6;
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			notifyElement(e, ClickType.PRESS);
+		}
+	
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			notifyElement(e, ClickType.RELEASE);
+		}
+	
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			notifyElement(e, ClickType.CLICK);
+		}
+		
+		private void notifyElement(MouseEvent e, ClickType clickType) {
+			TodoElement elem = elementAt(e.getY());
+			if (elem != null) {
+				switch (clickType) {
+					case PRESS:
+						elem.onMousePress(e);
+					break;
+					case CLICK:
+						elem.onMouseClick(e);
+					break;
+					case RELEASE:
+						elem.onMouseRelease(e);
+					break;
+				}
+				saveToFile();
+			}
+		}
+		private TodoElement elementAt(int y) {
+			y += yOffset;
+			
+			for (TodoElement event: elements) {
+				y -= event.getHeight(panel.getWidth());
+				y -= spacing;
+				
+				if (y < 0) {
+					return event;
+				}
+			}
+			
+			return null;
+		}
+	}
 	
 	
 	public TodoWidget() {
@@ -64,48 +120,7 @@ public class TodoWidget extends AbstractWidget {
 		elements.add(new AddEvent(this));
 		readInFile();
 		
-		MouseAdapter mouseControl = new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				yOffset += e.getWheelRotation() * (panel.getWidth() + spacing) / 6;
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e) {
-				TodoElement elem = elementAt(e.getY());
-				if (elem != null)
-					elem.onMousePress(e);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				TodoElement elem = elementAt(e.getY());
-				if (elem != null)
-					elem.onMouseRelease(e);
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				TodoElement elem = elementAt(e.getY());
-				if (elem != null)
-					elem.onMouseClick(e);
-			}
-		
-			private TodoElement elementAt(int y) {
-				y += yOffset;
-				
-				for (TodoElement event: elements) {
-					y -= event.getHeight(panel.getWidth());
-					y -= spacing;
-					
-					if (y < 0) {
-						return event;
-					}
-				}
-				
-				return null;
-			}
-		};
+		MouseControl mouseControl = new MouseControl();
 		panel.addMouseListener(mouseControl);
 		panel.addMouseWheelListener(mouseControl);
 	}
@@ -116,6 +131,7 @@ public class TodoWidget extends AbstractWidget {
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
 			String line = reader.readLine();
+			
 			try {
 				String[] settings = line.split(",");
 				spacing = Integer.parseInt(settings[0]);
@@ -247,7 +263,7 @@ public class TodoWidget extends AbstractWidget {
 		}
 		
 		
-		saveToFile();
+//		saveToFile();
 	}
 	
 	@Override
