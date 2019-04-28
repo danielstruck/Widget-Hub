@@ -20,6 +20,8 @@ public class Tone {
 		
 		private final double[] sin = new double[SECONDS_MAX * SAMPLE_RATE];
 		private final double[] sawtooth = new double[SECONDS_MAX * SAMPLE_RATE];
+		private final double[] square = new double[SECONDS_MAX * SAMPLE_RATE];
+		private final double[] triangle = new double[SECONDS_MAX * SAMPLE_RATE];
 		// TODO add sawtooth, square, etc waves
 		
 		

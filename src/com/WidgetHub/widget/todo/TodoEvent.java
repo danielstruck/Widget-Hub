@@ -24,10 +24,11 @@ import com.WidgetHub.widget.Toolbox;
 
 public class TodoEvent extends TodoElement {
 	private static final double SCROLL_STALL_STEP = 50;
-	private static final double SCROLL_TICK_STEP = .25;
+	private static final double SCROLL_TICK_STEP = .15;
 	protected StringScroller location;
 	protected StringScroller details;
 	protected boolean alertFlag;
+	protected boolean forceMaximize;
 	
 	protected class TodoEventEditPane extends BagGridPane {
 		private static final long serialVersionUID = 1L;
@@ -75,10 +76,11 @@ public class TodoEvent extends TodoElement {
 						
 						LocalDateTime dateTime = LocalDateTime.of(year, month, dayOfMonth, hour, minute);
 						TodoEvent event = new TodoEvent(TodoEventEditPane.this.todoEvent.widget);
+						event.forceMaximize = true;
 						event.setDateTime(dateTime);
 						event.setDetails(eventDetails);
 						event.setLocation(eventLocation);
-						event.renderWhole(g, 0, previewDim.width);
+						event.render(g, 0, previewDim.width);
 					}
 					catch (Exception e) {
 						g.setColor(Color.red);
@@ -207,9 +209,11 @@ public class TodoEvent extends TodoElement {
 		setDetails("");
 		
 		alertFlag = false;
+		forceMaximize = false;
 	}
 	public TodoEvent(TodoWidget widget, BufferedReader reader) {
 		super(widget, reader);
+		forceMaximize = false;
 
 		try {
 			setLocation(reader.readLine());
@@ -280,7 +284,7 @@ public class TodoEvent extends TodoElement {
 	
 	@Override
 	public int getHeight(int width) {
-		if (widget.isMinimized())
+		if (isMinimized())
 			return width / 15;
 		else
 			return getBaseHeight(width);
@@ -293,25 +297,18 @@ public class TodoEvent extends TodoElement {
 		return width / 10;
 	}
 	
-	
-	private void renderWhole(Graphics g, int y, int width) {
-		int height = getBaseHeight(width);
-		
-		drawBackground(g, y, width, height);
-		
-		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height * 3 / 11));
-		
-		drawDateTime(g, y, width, height);
-		drawLocation(g, y, width, height);
-		drawDetails(g, y, width, height);
+	public boolean isMinimized() {
+		return !forceMaximize && widget.isMinimized();
 	}
+	
+	
 	@Override
 	public void render(Graphics g, int y, int width) {
 		int height = getHeight(width);
 		
 		drawBackground(g, y, width, height);
 		
-		if (!widget.isMinimized()) {
+		if (!isMinimized()) {//!widget.isMinimized()) {
 			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height * 3 / 11));
 			
 			drawDateTime(g, y, width, height);
@@ -366,7 +363,7 @@ public class TodoEvent extends TodoElement {
 		FontMetrics fm = g.getFontMetrics();
 		
 		int yPos;
-		if (!widget.isMinimized())
+		if (!isMinimized())//!widget.isMinimized())
 			yPos = y + height * 8 / 10;
 		else
 			yPos = y + height * 5 / 10;
