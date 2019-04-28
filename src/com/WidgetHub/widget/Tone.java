@@ -6,8 +6,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 public class Tone {
+	// Useful tool: http://www.szynalski.com/tone-generator/
 	public enum Note {
-		// Useful tool: http://www.szynalski.com/tone-generator/
 		REST, A4, A4$, B4, C5, C5$, D5, D5$, E5, F5, F5$, G5, G5$, A5;
 		
 		public static final int SAMPLE_RATE = 16 * 1024; // ~16 KHz
@@ -19,6 +19,7 @@ public class Tone {
 		private static byte VOLUME = 127;
 		
 		private final double[] sin = new double[SECONDS_MAX * SAMPLE_RATE];
+		private final double[] sawtooth = new double[SECONDS_MAX * SAMPLE_RATE];
 		// TODO add sawtooth, square, etc waves
 		
 		
@@ -38,12 +39,15 @@ public class Tone {
 		}
 		
 		
-		public void play(int millis) {
+		public void play(int millis) throws IllegalArgumentException {
+			if (millis > SECONDS_MAX * 1000 || millis < 0)
+				throw new IllegalArgumentException("Play duration too long. Duration must be a positive integer that does not exceed " + 
+													(SECONDS_MAX * 1000) + " milliseconds. Recieved duration: " + millis + " milliseconds");
+			
 			try {
 				line.open(af, SAMPLE_RATE);
 				line.start();
 				
-				millis = Math.min(millis, SECONDS_MAX * 1000);
 				int length = SAMPLE_RATE * millis / 1000;
 				
 				line.write(amplify(sin), 0, length);
@@ -52,9 +56,9 @@ public class Tone {
 			}
 			catch (LineUnavailableException e) {
 				e.printStackTrace();
-				return;
 			}
 		}
+		
 		private byte[] amplify(double[] values) {
 			byte[] amplified = new byte[values.length];
 			
@@ -81,7 +85,11 @@ public class Tone {
 				Note parse = valueOf(note);
 				
 				if (parse != null) {
-					parse.play(millis);
+					try {
+						parse.play(millis);
+					} catch (IllegalArgumentException e) {
+						continue;
+					}
 					successes++;
 				}
 			}
@@ -90,7 +98,12 @@ public class Tone {
 		}
 		
 		public static void setVolume(double volume) {
-			VOLUME = (byte) (127 * Math.max(0, Math.min(volume, 1)));
+			if (volume >= 1)
+				VOLUME = 127;
+			else if (volume <= 0)
+				VOLUME = 0;
+			else
+				VOLUME = (byte) (127 * volume);
 		}
 		
 		
@@ -106,13 +119,26 @@ public class Tone {
 	
 	
 	public static void main(String[] args) {
-		Note.setVolume(.9);
-//		Note.play(100, "A4 B4");
-		Note.play(50, "B4 B4 B4");
+		Note.setVolume(.5);
 		
+		
+		
+		Note.play(100, "A4 B4");
+//		Note.play(50, "B4 B4 B4");
+		
+		
+		
+//		long start = System.currentTimeMillis();
+//		Note.C5$.play(6000);
+//		long end = System.currentTimeMillis();
+//		System.out.println(end - start);
+		
+		
+		
+//		int time = 0;
 //		for (Note note: Note.values()) {
 //			System.out.println(note.name());
-//			note.play(100);
+//			note.play((int) Math.pow(50 * ++time, 1.05));
 //		}
 	}
 }

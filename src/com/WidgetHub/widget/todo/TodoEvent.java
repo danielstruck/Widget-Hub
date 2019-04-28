@@ -23,6 +23,8 @@ import com.WidgetHub.widget.StringScroller;
 import com.WidgetHub.widget.Toolbox;
 
 public class TodoEvent extends TodoElement {
+	private static final double SCROLL_STALL_STEP = 50;
+	private static final double SCROLL_TICK_STEP = .25;
 	protected StringScroller location;
 	protected StringScroller details;
 	protected boolean alertFlag;
@@ -60,6 +62,7 @@ public class TodoEvent extends TodoElement {
 				
 				public void paint(Graphics g) {
 					super.paint(g);
+					
 					try {
 						String eventDetails = detailsText.getText();
 						String eventLocation = locationText.getText();
@@ -75,7 +78,7 @@ public class TodoEvent extends TodoElement {
 						event.setDateTime(dateTime);
 						event.setDetails(eventDetails);
 						event.setLocation(eventLocation);
-						event.render(g, 0, previewDim.width);
+						event.renderWhole(g, 0, previewDim.width);
 					}
 					catch (Exception e) {
 						g.setColor(Color.red);
@@ -99,12 +102,14 @@ public class TodoEvent extends TodoElement {
 			// month
 			for (Month m: Month.values())
 				monthBox.addItem(m);
+			
 			monthBox.addItemListener((e1) -> {
 				dayOfMonthBox.removeAllItems();
 				
 				for (int i = 1; i <= ((Month) monthBox.getSelectedItem()).maxLength(); i++)
 					dayOfMonthBox.addItem(i);
 			});
+			
 			monthBox.setSelectedItem(currentTime.getMonth());
 			
 			// day of month
@@ -211,7 +216,7 @@ public class TodoEvent extends TodoElement {
 			setDetails(reader.readLine());
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Unable to read event information.", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -266,11 +271,11 @@ public class TodoEvent extends TodoElement {
 	
 	
 	public void setLocation(String location) {
-		this.location = new StringScroller(location, 30, .5);
+		this.location = new StringScroller(location, SCROLL_STALL_STEP, SCROLL_TICK_STEP);
 	}
 	
 	public void setDetails(String details) {
-		this.details = new StringScroller(details, 30, .5);
+		this.details = new StringScroller(details, SCROLL_STALL_STEP, SCROLL_TICK_STEP);
 	}
 	
 	@Override
@@ -278,7 +283,10 @@ public class TodoEvent extends TodoElement {
 		if (widget.isMinimized())
 			return width / 15;
 		else
-			return width / 3;
+			return getBaseHeight(width);
+	}
+	private int getBaseHeight(int width) {
+		return width / 3;
 	}
 	
 	private int getArcSize(int width) {
@@ -286,6 +294,17 @@ public class TodoEvent extends TodoElement {
 	}
 	
 	
+	private void renderWhole(Graphics g, int y, int width) {
+		int height = getBaseHeight(width);
+		
+		drawBackground(g, y, width, height);
+		
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height * 3 / 11));
+		
+		drawDateTime(g, y, width, height);
+		drawLocation(g, y, width, height);
+		drawDetails(g, y, width, height);
+	}
 	@Override
 	public void render(Graphics g, int y, int width) {
 		int height = getHeight(width);

@@ -8,7 +8,7 @@ import com.WidgetHub.widget.ContextMenu;
 import com.WidgetHub.widget.Tone.Note;
 
 public class TodoTools {
-	private static boolean alertFlag;
+	private static volatile boolean alertFlag;
 	
 	private TodoTools() {}
 	
@@ -25,7 +25,7 @@ public class TodoTools {
 				.addItem("Change Size", (action) -> {
 					String input = null;
 					try {
-						input = JOptionPane.showInputDialog("Input frame width in pixels:");
+						input = JOptionPane.showInputDialog("Current width: " + widget.getPanelSize().width + " px. Input frame width in pixels:");
 						int width = Integer.parseInt(input);
 						widget.setSize(width, widget.getHeight());
 					} catch (Exception e) {
@@ -53,8 +53,8 @@ public class TodoTools {
 	
 	public static void alertBeep() {
 		if (!alertFlag) {
+			alertFlag = true;
 			new Thread(() -> {
-				alertFlag = true;
 				Note.play(100, "A4 B4");
 				alertFlag = false;
 			}).start();

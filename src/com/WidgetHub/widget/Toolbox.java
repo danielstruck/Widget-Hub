@@ -7,10 +7,6 @@ public class Toolbox {
 	
 	private Toolbox() {}
 
-	public static void note(Class<?> c, String s) {
-		System.out.println("[" + c.getSimpleName() + "] " + s);
-	}
-
 	public static void drawCenteredString(Graphics g, String s, int x, int y) {
 		FontMetrics fm = g.getFontMetrics();
 		

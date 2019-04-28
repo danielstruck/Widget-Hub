@@ -232,8 +232,9 @@ public class TodoWidget extends AbstractWidget {
 	}
 	public void resizeTo(int size) {
 		if (size < 100)
-			size = 100;
-		setSize(size, size * 3);
+			setSize(100, 300);
+		else
+			setSize(size, size * 3);
 	}
 	
 	
