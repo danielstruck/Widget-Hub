@@ -17,8 +17,6 @@ import com.WidgetHub.widget.memory.MemoryGameWidget;
 import com.WidgetHub.widget.timer.TimerWidget;
 import com.WidgetHub.widget.todo.TodoWidget;
 
-// TODO reduce CPU impact
-
 /**
  * One widget to rule them all. This hub keeps track of active widgets.
  * 
@@ -81,12 +79,6 @@ public class WidgetHub extends AbstractWidget {
 	public void render(Graphics g) {
 		
 	}
-	
-	
-	// TODO add functionality for saving the state of the hub; ie: which widget is open, etc
-	
-	
-	// TODO some widgets fail to have their size set properly, resulting in widgets not appearing on the screen
 }
 
 class WidgetCheckBox<Widget_T extends AbstractWidget> extends JCheckBox implements ItemListener {
@@ -95,7 +87,9 @@ class WidgetCheckBox<Widget_T extends AbstractWidget> extends JCheckBox implemen
 	private Widget_T widget;
 	private boolean widgetOpen;
 	
-	
+	// TODO reduce CPU impact by allowing widgets to be individually closed (Maybe add close JButton?)
+
+
 	public WidgetCheckBox(Class<Widget_T> widgetClass) {
 		super(widgetClass.getSimpleName());
 		

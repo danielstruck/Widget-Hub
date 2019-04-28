@@ -188,7 +188,7 @@ public class FractalExplorer extends FractalInfo {
 				);
 				
 				
-				ExecutorService service = Executors.newFixedThreadPool(imgWidth);
+				ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 				
 				for (int x = 0; x < imgWidth; x++) {
 					final int x_ = x;

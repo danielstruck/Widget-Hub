@@ -268,18 +268,18 @@ public class ClipboardWidget extends AbstractWidget {
 				}), // edit
 				item("Save", (action) -> {
 					try {
-						SavableClipboard.Builder factory = new SavableClipboard.Builder();
+						SavableClipboard.Builder builder = new SavableClipboard.Builder();
 						
 						if (stringFlavor)
-							factory.setText((String) c.getData(DataFlavor.stringFlavor));
+							builder.setText((String) c.getData(DataFlavor.stringFlavor));
 						if (imageFlavor)
-							factory.setImage((Image) c.getData(DataFlavor.imageFlavor));
+							builder.setImage((Image) c.getData(DataFlavor.imageFlavor));
 						if (javaFileListFlavor)
-							factory.setFiles((List<File>) c.getData(DataFlavor.javaFileListFlavor));
+							builder.setFiles((List<File>) c.getData(DataFlavor.javaFileListFlavor));
 //						else
 //							JOptionPane.showMessageDialog(frame, "Clipboard data type is unrecognized: ");// + lastDataType.getClass().getName());
 						
-						clipboards.add(factory.instantiate());
+						clipboards.add(builder.instantiate());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -338,14 +338,7 @@ public class ClipboardWidget extends AbstractWidget {
 						if (JOptionPane.showConfirmDialog(widget, p, "Clipboard Selector", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 							SavableClipboard clip = clipboards.get(clipboardIndexBox.getSelectedIndex());
 							
-							StringSelection ss = new StringSelection(clip.text);
-							c.setContents(ss, null);
-							
-							ImageSelection is = new ImageSelection(clip.img);
-							c.setContents(is, null);
-							
-							FileSelection fs = new FileSelection(clip.files);
-							c.setContents(fs, null);
+							Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clip, null);
 							
 							promptOpenFlag = false;
 						}
@@ -397,7 +390,7 @@ public class ClipboardWidget extends AbstractWidget {
 	}
 }
 
-class SavableClipboard {
+class SavableClipboard implements Transferable {
 	String text;
 	Image img;
 	List<File> files;
@@ -406,6 +399,28 @@ class SavableClipboard {
 		this.text = text;
 		this.img = img;
 		this.files = files;
+	}
+	
+	@Override
+	public DataFlavor[] getTransferDataFlavors() {
+		return new DataFlavor[] {DataFlavor.imageFlavor, DataFlavor.stringFlavor, DataFlavor.javaFileListFlavor};
+	}
+	
+	@Override
+	public boolean isDataFlavorSupported(DataFlavor flavor) {
+		return DataFlavor.imageFlavor.equals(flavor);
+	}
+	
+	@Override
+	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+		if (flavor.equals(DataFlavor.imageFlavor))
+			return img;
+		else if (flavor.equals(DataFlavor.stringFlavor))
+			return text;
+		else if (flavor.equals(DataFlavor.javaFileListFlavor))
+			return files;
+		else
+			throw new UnsupportedFlavorException(flavor);
 	}
 	
 	static class Builder {
@@ -437,68 +452,5 @@ class SavableClipboard {
 		public SavableClipboard instantiate() {
 			return new SavableClipboard(text, img, files);
 		}
-	}
-}
-
-class ImageSelection implements Transferable {
-	private Image image;
-	
-	
-	public ImageSelection(Image image) {
-		this.image = image;
-	}
-	
-	
-	// Returns supported flavors
-	@Override
-	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] {DataFlavor.imageFlavor};
-	}
-	
-	
-	// Returns true if flavor is supported
-	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		return DataFlavor.imageFlavor.equals(flavor);
-	}
-	
-	
-	// Returns image
-	@Override
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		if (!DataFlavor.imageFlavor.equals(flavor))
-			throw new UnsupportedFlavorException(flavor);
-		
-		return image;
-	}
-}
-
-class FileSelection implements Transferable {
-	private List<File> files;
-	
-	
-	public FileSelection(List<File> files) {
-		this.files = files;
-	}
-	
-
-	@Override
-	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] {DataFlavor.javaFileListFlavor};
-	}
-	
-
-	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		return DataFlavor.javaFileListFlavor.equals(flavor);
-	}
-	
-
-	@Override
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		if (!DataFlavor.javaFileListFlavor.equals(flavor))
-			throw new UnsupportedFlavorException(flavor);
-		
-		return files;
 	}
 }

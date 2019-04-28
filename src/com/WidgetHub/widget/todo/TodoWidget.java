@@ -2,6 +2,7 @@ package com.WidgetHub.widget.todo;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -104,6 +105,22 @@ public class TodoWidget extends AbstractWidget {
 			return null;
 		}
 	}
+	private class KeyControl extends KeyAdapter {
+		private Window window;
+		
+		public KeyControl(Window window) {
+			this.window = window;
+		}
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
+			switch (e.getKeyCode()) {
+				case KeyEvent.VK_HOME: // returns the widget to the center of the screen
+					window.setLocationRelativeTo(null);
+				break;
+			}
+		}
+	}
 	
 	
 	public TodoWidget() {
@@ -117,12 +134,15 @@ public class TodoWidget extends AbstractWidget {
 		yOffset = 0;
 		
 		elements = new ArrayList<TodoElement>();
-		elements.add(new AddEvent(this));
+		elements.add(new AddEvent(this)) ;
 		readInFile();
 		
 		MouseControl mouseControl = new MouseControl();
 		panel.addMouseListener(mouseControl);
 		panel.addMouseWheelListener(mouseControl);
+		
+		KeyControl keyControl = new KeyControl(this);
+		addKeyListener(keyControl);
 	}
 	private void readInFile() {
 		ArrayList<Class<? extends TodoElement>> elementTypes = new ArrayList<Class<? extends TodoElement>>();

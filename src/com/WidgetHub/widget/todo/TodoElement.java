@@ -22,7 +22,7 @@ public abstract class TodoElement implements Comparable<TodoElement> {
 	protected TodoElement(TodoWidget widget) {
 		this.widget = widget;
 		
-		setDateTime(LocalDateTime.MIN.withYear(LocalDateTime.now().getYear()));
+		setDateTime(LocalDateTime.now());
 	}
 	protected TodoElement(TodoWidget widget, BufferedReader reader) {
 		this(widget);
@@ -65,7 +65,7 @@ public abstract class TodoElement implements Comparable<TodoElement> {
 	
 	
 	public void setDateTime(LocalDateTime dateTime) {
-		this.dateTime = dateTime.withSecond(0).withNano(0);
+		this.dateTime = dateTime.withSecond(0);
 	}
 	public LocalDateTime getDateTime() {
 		return dateTime;
