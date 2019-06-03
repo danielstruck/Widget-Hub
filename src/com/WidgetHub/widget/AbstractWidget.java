@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -15,22 +17,32 @@ public abstract class AbstractWidget extends JFrame {
 	private static final long serialVersionUID = 1L;
 	protected JPanel panel;
 	protected WidgetDragger dragAdapter;
-	private boolean closed;
+	private boolean windowInFocus;
+	
 	
 	/**
 	 * Empty constructor for ease of importing external, self-contained applications (widgets)
 	 */
 	protected AbstractWidget() {
-		
+		addWindowFocusListener(new WindowFocusListener() {
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+				windowInFocus = true;
+			}
+			
+			@Override
+			public void windowLostFocus(WindowEvent e) {
+				windowInFocus = false;
+			}
+		});
 	}
 	protected AbstractWidget(boolean isTransparent, int updateDelay, String iconPath) {
-		closed = false;
+		this();
 		
 		if (iconPath != null) {
 			try {
 				setIconImage(ImageIO.read(getClass().getResource(iconPath)));
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				System.err.println("Could not read icon image");
 			}
 		}
@@ -71,6 +83,10 @@ public abstract class AbstractWidget extends JFrame {
 	}
 	
 	
+	public abstract void update();
+	public abstract void render(Graphics g);
+	
+	
 	public WidgetDragger getDragAdapter() {
 		return dragAdapter;
 	}
@@ -81,14 +97,11 @@ public abstract class AbstractWidget extends JFrame {
 	}
 	
 	
-	public abstract void update();
-	public abstract void render(Graphics g);
-	
-	
-	public void close() {
-		closed = true;
+	public boolean isWindowInFocus() {
+		return windowInFocus;
 	}
-	public boolean hasClosed() {
-		return closed;
+	
+	public void destroy() {
+		super.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
 }

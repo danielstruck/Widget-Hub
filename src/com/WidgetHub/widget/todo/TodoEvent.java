@@ -5,8 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 import java.time.Month;
 
@@ -23,12 +23,14 @@ import com.WidgetHub.widget.StringScroller;
 import com.WidgetHub.widget.Toolbox;
 
 public class TodoEvent extends TodoElement {
-	private static final double SCROLL_STALL_STEP = 50;
-	private static final double SCROLL_TICK_STEP = .15;
+	private static final long serialVersionUID = 1L;
+	
+	
 	protected StringScroller location;
 	protected StringScroller details;
 	protected boolean alertFlag;
 	protected boolean forceMaximize;
+	
 	
 	protected class TodoEventEditPane extends BagGridPane {
 		private static final long serialVersionUID = 1L;
@@ -80,7 +82,10 @@ public class TodoEvent extends TodoElement {
 						event.setDateTime(dateTime);
 						event.setDetails(eventDetails);
 						event.setLocation(eventLocation);
-						event.render(g, 0, previewDim.width);
+//						event.render(g, 0, 0, previewDim.width);
+						BufferedImage img = new BufferedImage(previewDim.width, event.getHeight(previewDim.width), BufferedImage.TYPE_INT_ARGB);
+						event.renderElement(img);
+						g.drawImage(img, 0, 0, null);
 					}
 					catch (Exception e) {
 						g.setColor(Color.red);
@@ -200,7 +205,7 @@ public class TodoEvent extends TodoElement {
 			}
 		}
 	}
-
+	
 	
 	public TodoEvent(TodoWidget widget) {
 		super(widget);
@@ -211,22 +216,10 @@ public class TodoEvent extends TodoElement {
 		alertFlag = false;
 		forceMaximize = false;
 	}
-	public TodoEvent(TodoWidget widget, BufferedReader reader) {
-		super(widget, reader);
-		forceMaximize = false;
-
-		try {
-			setLocation(reader.readLine());
-			setDetails(reader.readLine());
-		}
-		catch (IOException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Unable to read event information.", JOptionPane.ERROR_MESSAGE);
-		}
-	}
+	
 	
 	public void edit() {
-		TodoEventEditPane gridPane = new TodoEventEditPane(this);
-		gridPane.showConfirmDialog(widget);
+		new TodoEventEditPane(this).showConfirmDialog(widget);
 	}
 	
 	
@@ -234,12 +227,10 @@ public class TodoEvent extends TodoElement {
 	public void alert() {
 		if (alertFlag == false) {
 			alertFlag = true;
-			TodoTools.alertBeep();
+			TodoTools.alertBeep(100, "A4 B4");
 		}
 	}
-	/**
-	 * @return true if alert was reset, false otherwise.
-	 */
+	/** @return true if alert was reset, false otherwise. */
 	protected boolean resetAlerts() {
 		if (alertFlag) {
 			alertFlag = false;
@@ -253,49 +244,41 @@ public class TodoEvent extends TodoElement {
 	
 	@Override
 	public void applyCustomContextMenu(ContextMenu contextMenu) {
+		TodoEvent event = this;
 		contextMenu.addItem("Edit", (action) -> {
-						edit();
+						event.edit();
 					})
 					.addItemIf(alertFlag, "Snooze +5", (action) -> {
-						setDateTime(LocalDateTime.now().plusMinutes(5));
-						alertFlag = false;
+						event.setDateTime(LocalDateTime.now().plusMinutes(5));
+						event.alertFlag = false;
 					})
 					.addItemIf(alertFlag, "Snooze +30", (action) -> {
-						setDateTime(LocalDateTime.now().plusMinutes(30));
-						alertFlag = false;
+						event.setDateTime(LocalDateTime.now().plusMinutes(30));
+						event.alertFlag = false;
 					})
-					.addItem((!hasClosed())? "Delete": "Restore", (action) -> {
-						setClosed(!hasClosed());
-					})
-					.addItem("Flush", (action) -> {
-						if (JOptionPane.showConfirmDialog(widget, "Confirm flush? This action is irreversable.") == JOptionPane.OK_OPTION)
-							widget.flush();
+					.addItem((!hasClosed())? "Mark": "Restore", (action) -> {
+						event.setClosed(!hasClosed());
 					});
 	}
 	
 	
 	public void setLocation(String location) {
-		this.location = new StringScroller(location, SCROLL_STALL_STEP, SCROLL_TICK_STEP);
+		this.location = new StringScroller(location, StringScroller.DEFAULT_SCROLL_STALL_STEP, StringScroller.DEFAULT_SCROLL_TICK_STEP);
 	}
 	
 	public void setDetails(String details) {
-		this.details = new StringScroller(details, SCROLL_STALL_STEP, SCROLL_TICK_STEP);
+		this.details = new StringScroller(details, StringScroller.DEFAULT_SCROLL_STALL_STEP, StringScroller.DEFAULT_SCROLL_TICK_STEP);
 	}
+	
 	
 	@Override
 	public int getHeight(int width) {
 		if (isMinimized())
 			return width / 15;
 		else
-			return getBaseHeight(width);
-	}
-	private int getBaseHeight(int width) {
-		return width / 3;
+			return width / 3;
 	}
 	
-	private int getArcSize(int width) {
-		return width / 10;
-	}
 	
 	public boolean isMinimized() {
 		return !forceMaximize && widget.isMinimized();
@@ -303,85 +286,71 @@ public class TodoEvent extends TodoElement {
 	
 	
 	@Override
-	public void render(Graphics g, int y, int width) {
-		int height = getHeight(width);
+	public void renderElement(BufferedImage canvas) {
+		Graphics2D g = canvas.createGraphics();
 		
-		drawBackground(g, y, width, height);
-		
-		if (!isMinimized()) {//!widget.isMinimized()) {
-			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height * 3 / 11));
-			
-			drawDateTime(g, y, width, height);
-			drawLocation(g, y, width, height);
+		drawBackground(g, canvas);
+
+		if (!isMinimized()) {
+			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, canvas.getHeight() * 3 / 11));
+			drawDateTime(g, canvas);
+			drawLocation(g, canvas);
 		}
 		else
-			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height));
+			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, canvas.getHeight()));
 		
-		drawDetails(g, y, width, height);
+		drawDetails(g, canvas);
+		
+		g.dispose();
 	}
-	protected void drawBackground(Graphics g, int y, int width, int height) {
-		final int arcSize = getArcSize(width);
+	protected void drawBackground(Graphics2D g, BufferedImage canvas) {
+		final int arcSize = getArcSize(canvas.getWidth());
 		
-		g.setColor(Color.black);
-		g.fillRoundRect(0, y + 1, width, height, arcSize, arcSize);
+		g.setColor(colorOf(0, 0, 0));
+		g.fillRoundRect(0, 1, canvas.getWidth(), canvas.getHeight(), arcSize, arcSize);
 		
 		Color c;
 		LocalDateTime now = LocalDateTime.now();
 		if (alertFlag && (System.currentTimeMillis() % 500 > 250))
-			c = Color.red;
+			c = colorOf(255, 0, 0);
 		else if (getDateTime().isBefore(now.plusDays(7)))
-			c = new Color(192 - 50, 192, 192); // light gray w/ cyan tint
+			c = colorOf(192 - 50, 192, 192); // light gray w/ cyan tint
 		else
-			c = Color.lightGray;
-		
-		if (hasClosed())
-			c = c.darker().darker();
+			c = colorOf(192, 192, 192);
 		
 		g.setColor(c);
-		g.fillRoundRect(1, y, width - 1, height - 1, arcSize, arcSize);
+		g.fillRoundRect(1, 0, canvas.getWidth() - 1, canvas.getHeight() - 1, arcSize, arcSize);
 	}
-	protected void drawDateTime(Graphics g, int y, int width, int height) {
-		int dateTimeY = y + height * 2 / 10;
+	protected void drawDateTime(Graphics2D g, BufferedImage canvas) {
+		int dateTimeY = canvas.getHeight() * 2 / 10;
 		
 		String formattedDateTime = defaultDateTimeFormat.format(getDateTime());
 		
-		g.setColor(Color.blue);
-		Toolbox.drawCenteredString(g, formattedDateTime, width / 2, dateTimeY);
+		g.setColor(colorOf(0, 0, 255));
+		Toolbox.drawCenteredString(g, formattedDateTime, canvas.getWidth() / 2, dateTimeY);
 	}
-	protected void drawLocation(Graphics g, int y, int width, int height) {
+	protected void drawLocation(Graphics2D g, BufferedImage canvas) {
 		final int xOffset = 7;
 		FontMetrics fm = g.getFontMetrics();
 		
-		int yPos = y + height * 5 / 10;
+		int yPos = canvas.getHeight() * 5 / 10;
 		yPos += Toolbox.getFontHeight(fm) / 2;
 
-		g.setColor(new Color(125, 60, 0));
-		g.drawString(location.next(fm, width - xOffset), xOffset, yPos);
+		g.setColor(colorOf(125, 60, 0));
+		g.drawString(location.next(fm, canvas.getWidth() - xOffset), xOffset, yPos);
 	}
-	protected void drawDetails(Graphics g, int y, int width, int height) {
+	protected void drawDetails(Graphics2D g, BufferedImage canvas) {
 		final int xOffset = 7;
 		FontMetrics fm = g.getFontMetrics();
 		
-		int yPos;
-		if (!isMinimized())//!widget.isMinimized())
-			yPos = y + height * 8 / 10;
+		int yPos= Toolbox.getFontHeight(fm) / 2;
+		
+		if (!isMinimized())
+			yPos += canvas.getHeight() * 8 / 10;
 		else
-			yPos = y + height * 5 / 10;
-		yPos += Toolbox.getFontHeight(fm) / 2;
+			yPos += canvas.getHeight() * 5 / 10;
 
-		g.setColor(Color.black);
-		g.drawString(details.next(fm, width - xOffset), xOffset, yPos);
-	}
-	
-	
-	@Override
-	public String data() {
-		String tor = getClass().getSimpleName() + "\n";
-		
-		tor += super.data();
-		tor += location.text + "\n";
-		tor += details.text + "\n";
-		
-		return tor;
+		g.setColor(colorOf(0, 0, 0));
+		g.drawString(details.next(fm, canvas.getWidth() - xOffset), xOffset, yPos);
 	}
 }

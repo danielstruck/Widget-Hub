@@ -17,7 +17,7 @@ public class EscapeCloseAdapter extends KeyAdapter {
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_ESCAPE:
 				if (JOptionPane.showConfirmDialog(widget, "Confirm close?") == JOptionPane.OK_OPTION)
-					widget.close();
+					widget.destroy();
 			break;
 		}
 	}

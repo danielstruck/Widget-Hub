@@ -1,12 +1,21 @@
 package com.WidgetHub.widget;
 
 import java.awt.FontMetrics;
+import java.io.Serializable;
 
-public class StringScroller {
+public class StringScroller implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+
+	public static final double DEFAULT_SCROLL_STALL_STEP = 50;
+	public static final double DEFAULT_SCROLL_TICK_STEP = .15;
+	
+	
 	private final double stallStep;
 	private final double tickStep;
 	private double indexStart;
 	public String text;
+	
 	
 	public StringScroller(String text, double stallStep, double tickStep) {
 		this.text = text;

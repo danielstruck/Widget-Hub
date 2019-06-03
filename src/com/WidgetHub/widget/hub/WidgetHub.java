@@ -70,15 +70,10 @@ public class WidgetHub extends AbstractWidget {
 	
 	
 	@Override
-	public void update() {
-		
-	}
-	
+	public void update() {}
 	
 	@Override
-	public void render(Graphics g) {
-		
-	}
+	public void render(Graphics g) {}
 }
 
 class WidgetCheckBox<Widget_T extends AbstractWidget> extends JCheckBox implements ItemListener {
@@ -86,8 +81,6 @@ class WidgetCheckBox<Widget_T extends AbstractWidget> extends JCheckBox implemen
 	private Class<Widget_T> widgetClass;
 	private Widget_T widget;
 	private boolean widgetOpen;
-	
-	// TODO reduce CPU impact by allowing widgets to be individually closed (Maybe add close JButton?)
 
 
 	public WidgetCheckBox(Class<Widget_T> widgetClass) {
@@ -111,22 +104,16 @@ class WidgetCheckBox<Widget_T extends AbstractWidget> extends JCheckBox implemen
 	public void setWidgetOpen(boolean widgetOpen) {
 		this.widgetOpen = widgetOpen;
 		
-		if (widget != null) {
-			widget.setVisible(widgetOpen);
-		}
-		else {
+		if (widgetOpen) {
 			try {
 				widget = widgetClass.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
 		}
-	}
-	public boolean getWidgetOpen() {
-		return widgetOpen;
-	}
-	
-	public Widget_T getWidget() {
-		return widget;
+		else {
+			widget.destroy(); // close widget
+			widget = null; // remove reference
+		}
 	}
 }

@@ -55,10 +55,10 @@ public class TimerWidget extends AbstractWidget {
 			}
 			catch (FileNotFoundException e1) {
 				JOptionPane.showMessageDialog(null, "Unable to create error log.", "Error durring operation", JOptionPane.ERROR_MESSAGE);
-				close();
+				destroy();
 			}
 			JOptionPane.showMessageDialog(null, "Error data has been logged. \nSee file on desktop for more information.", "Error durring operation", JOptionPane.ERROR_MESSAGE);
-			close();
+			destroy();
 		}
 	}
 	private void setup() throws Exception {
@@ -213,7 +213,7 @@ public class TimerWidget extends AbstractWidget {
 					this.setSize(this.getWidth(), this.getHeight() - closeDisp);
 				}
 				
-				close();
+				destroy();
 			}
 		});
 		JMenuItem cushion = generateMenuOption("Change Cushion", (e) -> {

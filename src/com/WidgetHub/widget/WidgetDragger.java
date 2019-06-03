@@ -3,11 +3,16 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
-public class WidgetDragger extends MouseAdapter {
+public class WidgetDragger extends MouseAdapter implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	
 	private Point dragPoint;
 	private Component component;
 	private boolean enabled;
+	
 	
 	public WidgetDragger(Component component) {
 		this.component = component;

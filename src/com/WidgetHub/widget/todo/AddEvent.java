@@ -1,15 +1,19 @@
 package com.WidgetHub.widget.todo;
 
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
 
 import com.WidgetHub.widget.ContextMenu;
 import com.WidgetHub.widget.Toolbox;
 
 public class AddEvent extends TodoElement {
+	private static final long serialVersionUID = 1L;
+	
+	
 	public AddEvent(TodoWidget widget) {
 		super(widget);
 		
@@ -19,12 +23,12 @@ public class AddEvent extends TodoElement {
 	
 	
 	@Override
-	public void onMouseClick(MouseEvent e) {
+	public void onMouseClick(MouseEvent e, Point adjustedClick) {
 		if (e.getButton() == MouseEvent.BUTTON1)
 			widget.addElement(new TodoEvent(widget));
 	}
-	
-	
+
+
 	@Override
 	public int getHeight(int width) {
 		if (widget.isMinimized())
@@ -33,47 +37,52 @@ public class AddEvent extends TodoElement {
 			return width / 3;
 	}
 	
-	private int getArcSize(int width) {
-		return width / 10;
-	}
-	
 	
 	@Override
 	public void setClosed(boolean closed) {
 		/* This element cannot be closed */
 	}
+	
+	
 	@Override
 	public void alert() {
 		/* This element cannot be alerted */
 	}
+	
+	
 	@Override
 	public void applyCustomContextMenu(ContextMenu contextMenu) {
 		contextMenu.addItem("Add event", (action) -> {
-						widget.addElement(new TodoEvent(widget));
+							widget.addElement(new TodoEvent(widget));
 					}).addItem("Add repeatable", (action) -> {
-						widget.addElement(new RepeatableTodoEvent(widget));
+							widget.addElement(new RepeatableTodoEvent(widget));
+					}).addItem("Add Job", (action) -> {
+							widget.addElement(new JobElement(widget));
+					}).addItem("Add Note", (action) -> {
+							widget.addElement(new NoteElement(widget));
 					});
 	}
 	
+	
 	@Override
-	public void render(Graphics g, int y, int width) {
-		int height = getHeight(width);
+	public void renderElement(BufferedImage canvas) {
+		Graphics2D g = canvas.createGraphics();
 		
-		drawBackground(g, y, width, height);
-		drawAddEvent(g, y, width, height);
+		drawBackground(g, canvas);
+		drawAddEvent(g, canvas);
 	}
-	protected void drawBackground(Graphics g, int y, int width, int height) {
-		final int arcSize = getArcSize(width);
+	protected void drawBackground(Graphics2D g, BufferedImage canvas) {
+		final int arcSize = getArcSize(canvas.getWidth());
 		
-		g.setColor(Color.black);
-		g.fillRoundRect(0, y + 1, width, height, arcSize, arcSize);
+		g.setColor(colorOf(0, 0, 0));
+		g.fillRoundRect(0, 1, canvas.getWidth(), canvas.getHeight(), arcSize, arcSize);
 		
-		g.setColor(Color.lightGray);
-		g.fillRoundRect(1, y, width - 1, height - 1, arcSize, arcSize);
+		g.setColor(colorOf(192, 192, 192));
+		g.fillRoundRect(1, 0, canvas.getWidth() - 1, canvas.getHeight() - 1, arcSize, arcSize);
 	}
-	protected void drawAddEvent(Graphics g, int y, int width, int height) {
-		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, height));
-		g.setColor(Color.darkGray);
-		Toolbox.drawCenteredString(g, "+", width / 2, y + height / 2);
+	protected void drawAddEvent(Graphics2D g, BufferedImage canvas) {
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, canvas.getHeight()));
+		g.setColor(colorOf(64, 64, 64));
+		Toolbox.drawCenteredString(g, "+", canvas.getWidth() / 2, canvas.getHeight() / 2);
 	}
 }

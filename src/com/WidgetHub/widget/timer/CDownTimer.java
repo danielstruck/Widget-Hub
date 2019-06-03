@@ -3,7 +3,7 @@ package com.WidgetHub.widget.timer;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import com.WidgetHub.widget.Tone.Note;
+import com.WidgetHub.tone.Note;
 
 public class CDownTimer extends CStopWatch {
 	private long startTime;
@@ -23,7 +23,7 @@ public class CDownTimer extends CStopWatch {
 	public void setExpired(boolean expired){
 		this.expired = expired;
 		if(expired)
-			Note.play(50, "A4 A4 A4");
+			Note.playSinNotes(50, "A4 A4 A4");
 	}
 	
 	public void render (int renderY, Graphics g) {

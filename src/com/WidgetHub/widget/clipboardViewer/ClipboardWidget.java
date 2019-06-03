@@ -2,26 +2,18 @@ package com.WidgetHub.widget.clipboardViewer;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -33,6 +25,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.WidgetHub.tone.Note;
 import com.WidgetHub.widget.AbstractWidget;
 import com.WidgetHub.widget.WidgetResizer;
 
@@ -50,41 +43,27 @@ public class ClipboardWidget extends AbstractWidget {
 	private static final int updateDelay = 100;
 	private static final String iconPath = null; // TODO make clipboard widget icon
 	
-	// settings
-	private static final int fontSize = 15;
-	private static final int horizBuff = 2;
-	private static final Font flavorTypeFont = new Font(Font.SANS_SERIF, Font.BOLD, fontSize);
-	private static final Color flavorTypeColor = Color.magenta;
-	
 	// instance variables
-	private static final Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-	private static boolean stringFlavor, javaFileListFlavor, imageFlavor;
 	private ArrayList<SavableClipboard> clipboards;
 	private WidgetResizer resizer;
 	private int infoHeight;
 	private int scroll;
+	private int spacing;
 	private boolean promptOpenFlag;
+	private ClipboardData<?> data[] = {new ClipboardFileData(), new ClipboardStringData(), new ClipboardImageData(), new ClipboardNullData()};
 	
 	
 	public ClipboardWidget() {
 		super(isTransparent, updateDelay, iconPath);
-		
-		setTitle("Clipboard Widget");
 
 		clipboards = new ArrayList<SavableClipboard>();
 		infoHeight = 0;
 		scroll = 0;
-		stringFlavor = false;
-		javaFileListFlavor = false;
-		imageFlavor = false;
-		
+		spacing = 5;
 		
 		resizer = new WidgetResizer(this);
 		panel.addMouseListener(resizer);
 		panel.addMouseMotionListener(resizer);
-		setBackground(new Color(80, 80, 80));
-		
-		setJMenuBar(menubar(this));
 		
 		panel.addMouseWheelListener(new MouseWheelListener() {
 			
@@ -99,6 +78,37 @@ public class ClipboardWidget extends AbstractWidget {
 			}
 		});
 		
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				switch (e.getKeyCode()) {
+					case KeyEvent.VK_0:
+					case KeyEvent.VK_1:
+					case KeyEvent.VK_2:
+					case KeyEvent.VK_3:
+					case KeyEvent.VK_4:
+					case KeyEvent.VK_5:
+					case KeyEvent.VK_6:
+					case KeyEvent.VK_7:
+					case KeyEvent.VK_8:
+					case KeyEvent.VK_9:
+						int index = e.getKeyChar() - '0';
+						
+						if (index < clipboards.size()) {
+							SavableClipboard clip = clipboards.get(index);
+							Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clip, null);
+						}
+						else {
+							Note.playSinNotes(75, "A4");
+						}
+					break;
+				}
+			}
+		});
+		
+		setJMenuBar(menubar(this));
+		setTitle("Clipboard Widget");
+		setBackground(new Color(80, 80, 80));
 		setSize(450, 500);
 		setMinimumSize(new Dimension(50, 50));
 		revalidate();
@@ -113,123 +123,30 @@ public class ClipboardWidget extends AbstractWidget {
 	
 	@Override
 	public void render(Graphics g) {
-		Point pos = new Point(horizBuff, -scroll);
-		boolean handledFlavor = true;
-		handledFlavor &= tryFileFlavor(g, pos);
-		handledFlavor &= tryStringFlavor(g, pos);
-		handledFlavor &= tryImageFlavor(g, pos);
-		if (handledFlavor)
-			unhandledFlavor(g, pos);
+		int y = -scroll;
 		
-		infoHeight = pos.y + scroll;
+		boolean dataMatchFound = false;
+		for (ClipboardData<?> dataElement: data) {
+			if (dataElement.getClass().getName().equals(ClipboardNullData.class.getName()) && dataMatchFound)
+				continue;
+			
+			int canvasHeight = dataElement.getHeight();
+			if (canvasHeight > 0) {
+				BufferedImage canvas = new BufferedImage(panel.getWidth(), canvasHeight, BufferedImage.TYPE_INT_ARGB);
+				dataElement.tryFlavor(canvas);
+				g.drawImage(canvas, 0, y, null);
+				y += canvasHeight + spacing;
+				dataMatchFound = true;
+			}
+		}
+		
+		infoHeight = y + scroll;
 		
 		g.setColor(new Color(0, 255, 255, 40));
-		g.fillOval(panel.getWidth() - WidgetResizer.DRAG_AREA_SZ, panel.getHeight() - WidgetResizer.DRAG_AREA_SZ, 2*WidgetResizer.DRAG_AREA_SZ, 2*WidgetResizer.DRAG_AREA_SZ);
+		g.fillOval(panel.getWidth() - WidgetResizer.DRAG_AREA_SZ, panel.getHeight() - WidgetResizer.DRAG_AREA_SZ, 2 * WidgetResizer.DRAG_AREA_SZ, 2 * WidgetResizer.DRAG_AREA_SZ);
 		
 		g.setColor(Color.black);
 		g.drawRect(0, 0, panel.getWidth() - 1, panel.getHeight() - 1);
-	}
-	private boolean tryFileFlavor(Graphics g, Point pos) {
-		try {
-			pos.y += fontSize;
-			g.setFont(flavorTypeFont);
-			g.setColor(flavorTypeColor);
-			g.drawString("FILE", pos.x, pos.y);
-			
-			@SuppressWarnings("unchecked")
-			List<File> files = (List<File>) c.getData(DataFlavor.javaFileListFlavor);
-			
-			drawFileFlavor(files, g, pos);
-			
-			javaFileListFlavor = true;
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-	private void drawFileFlavor(List<File> files, Graphics g, Point pos) {
-		int longestX = 0;
-		Point borderStart = new Point(pos.x, pos.y + 1);
-		for (File f: files) {
-			pos.y += fontSize;
-			g.setColor((f.isDirectory()? Color.green: Color.blue));
-			g.drawString(f.getName(), pos.x + 2, pos.y);
-			longestX = Math.max(longestX, g.getFontMetrics().stringWidth(f.getName()) + horizBuff);
-		}
-		pos.y += 5;
-		g.drawRect(borderStart.x, borderStart.y, longestX + 2, pos.y - borderStart.y);
-	}
-	private boolean tryStringFlavor(Graphics g, Point pos) {
-		try {
-			pos.y += fontSize;
-			g.setFont(flavorTypeFont);
-			g.setColor(flavorTypeColor);
-			g.drawString("TEXT", pos.x, pos.y);
-			
-			String text = (String) c.getData(DataFlavor.stringFlavor);
-			
-			drawStringFlavor(text, g, pos);
-			
-			stringFlavor = true;
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-	private void drawStringFlavor(String text, Graphics g, Point pos) {
-		g.setColor(Color.black);
-		int longestX = 0;
-		Point borderStart = new Point(pos.x, pos.y + 1);
-		for (String s: text.split("\n")) {
-			pos.y += fontSize;
-			s = s.replace("\t", "    ");
-			g.drawString(s, pos.x + 2, pos.y);
-			longestX = Math.max(longestX, g.getFontMetrics().stringWidth(s) + horizBuff);
-		}
-		pos.y += 5;
-		g.drawRect(borderStart.x, borderStart.y, longestX + 2, pos.y - borderStart.y);
-	}
-	private boolean tryImageFlavor(Graphics g, Point pos) {
-		try {
-			pos.y += fontSize;
-			g.setFont(flavorTypeFont);
-			g.setColor(flavorTypeColor);
-			g.drawString("IMAGE", pos.x, pos.y);
-			
-			Image img = (Image) c.getData(DataFlavor.imageFlavor);
-			
-			drawImageFlavor(img, g, pos);
-			
-			imageFlavor = true;
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-	private void drawImageFlavor(Image img, Graphics g, Point pos) {
-		Rectangle border = new Rectangle(pos.x - 1, pos.y + 5 - 1, img.getWidth(null) + 1, img.getHeight(null) + 1);
-		g.setColor(Color.black);
-		g.drawRect(border.x, border.y, border.width, border.height);
-		g.drawImage(img, pos.x, pos.y + 5, null);
-		
-		pos.y += border.height;
-	}
-	private void unhandledFlavor(Graphics g, Point pos) {
-		pos.y += fontSize;
-		g.setFont(flavorTypeFont);
-		g.setColor(flavorTypeColor);
-		
-		for (DataFlavor f: c.getAvailableDataFlavors()) {
-			try {
-				c.getData(f);
-				
-				g.drawString("unhandled DataFlavor: " + f.getClass().getCanonicalName(), pos.x, pos.y);
-				
-				return;
-			} catch (Exception e) {}
-		}
-		
-		g.drawString("unhandled DataFlavor of unknown type", pos.x, pos.y);
 	}
 	
 	
@@ -241,49 +158,35 @@ public class ClipboardWidget extends AbstractWidget {
 		menuBar.add(
 			menu("File", 
 				item("Edit", (action) -> {
-					try {
-						if (stringFlavor) {
-							String input = JOptionPane.showInputDialog(frame, "Change clipboard contents", c.getData(DataFlavor.stringFlavor));
-							
-							if (input != null) {
-								StringSelection str = new StringSelection(input);
-								c.setContents(str, str);
-							}
-							else {
-								JOptionPane.showMessageDialog(frame, "Clipboard edit canceled");
-							}
-						}
-						if (imageFlavor) {
-							JOptionPane.showMessageDialog(frame, "Image editing unimplemented");
-						}
-						if (javaFileListFlavor) {
-							JOptionPane.showMessageDialog(frame, "File editing unimplemented");
-						}
+					JOptionPane.showMessageDialog(frame, "Edit tool has been disabled due to bugs.");
+//					try {
+//						if (stringFlavor) {
+//							String input = JOptionPane.showInputDialog(frame, "Change clipboard contents", ClipboardData.clipboard.getData(DataFlavor.stringFlavor));
+//							
+//							if (input != null) {
+//								StringSelection str = new StringSelection(input);
+//								ClipboardData.clipboard.setContents(str, str);
+//							}
+//							else {
+//								JOptionPane.showMessageDialog(frame, "Clipboard edit canceled");
+//							}
+//						}
+//						if (imageFlavor) {
+//							JOptionPane.showMessageDialog(frame, "Image editing unimplemented");
+//						}
+//						if (javaFileListFlavor) {
+//							JOptionPane.showMessageDialog(frame, "File editing unimplemented");
+//						}
 //						else {
 //							JOptionPane.showMessageDialog(frame, "Clipboard data type is unrecognized: ");// + lastDataType.getClass().getName());
 //						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}), // edit
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+				}), // Edit
 				item("Save", (action) -> {
-					try {
-						SavableClipboard.Builder builder = new SavableClipboard.Builder();
-						
-						if (stringFlavor)
-							builder.setText((String) c.getData(DataFlavor.stringFlavor));
-						if (imageFlavor)
-							builder.setImage((Image) c.getData(DataFlavor.imageFlavor));
-						if (javaFileListFlavor)
-							builder.setFiles((List<File>) c.getData(DataFlavor.javaFileListFlavor));
-//						else
-//							JOptionPane.showMessageDialog(frame, "Clipboard data type is unrecognized: ");// + lastDataType.getClass().getName());
-						
-						clipboards.add(builder.instantiate());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}), // save
+					clipboards.add(new SavableClipboard(data));
+				}), // Save
 				item("Load", (action) -> {
 					if (clipboards.size() == 0) {
 						JOptionPane.showMessageDialog(widget, "No cliboards saved.");
@@ -302,13 +205,33 @@ public class ClipboardWidget extends AbstractWidget {
 							super.paint(g);
 							
 							int index = clipboardIndexBox.getSelectedIndex();
-							Point pos = new Point(horizBuff, 0);
-							if (clipboards.get(index).files != null)
-								drawFileFlavor(clipboards.get(index).files, g, pos);
-							if (clipboards.get(index).text != null)
-								drawStringFlavor(clipboards.get(index).text, g, pos);
-							if (clipboards.get(index).img != null)
-								drawImageFlavor(clipboards.get(index).img, g, pos);
+							SavableClipboard clip = clipboards.get(index);
+							
+							int y = 0;
+							
+							if (clip.files != null) {
+								BufferedImage img = new BufferedImage((int) previewDim.getWidth(), ClipboardFileData.getHeight(clip.files), BufferedImage.TYPE_INT_ARGB);
+								Graphics2D g2 = img.createGraphics();
+								((ClipboardFileData) data[0]).drawFlavor(clip.files, g2);
+								g.drawImage(img, 0, y, null);
+								y += img.getHeight();
+							}
+
+							if (clip.text != null) {
+								BufferedImage img = new BufferedImage((int) previewDim.getWidth(), ClipboardStringData.getHeight(clip.text), BufferedImage.TYPE_INT_ARGB);
+								Graphics2D g2 = img.createGraphics();
+								((ClipboardStringData) data[1]).drawFlavor(clip.text, g2);
+								g.drawImage(img, 0, y, null);
+								y += img.getHeight();
+							}
+
+							if (clip.img != null) {
+								BufferedImage img = new BufferedImage((int) previewDim.getWidth(), ClipboardImageData.getHeight(clip.img), BufferedImage.TYPE_INT_ARGB);
+								Graphics2D g2 = img.createGraphics();
+								((ClipboardImageData) data[2]).drawFlavor(clip.img, g2);
+								g.drawImage(img, 0, y, null);
+								y += img.getHeight();
+							}
 						}
 					};
 					previewPanel.setPreferredSize(previewDim);
@@ -322,16 +245,15 @@ public class ClipboardWidget extends AbstractWidget {
 					constraints.ipady = 4;
 					constraints.fill = GridBagConstraints.HORIZONTAL;
 					
-					int row = 0;
-					addBagLine(constraints, 0, row++, p, "Preview", previewPanel);
-					addBagLine(constraints, 0, row++, p, "Index", clipboardIndexBox);
+					addBagLine(constraints, 0, 0, p, "Preview", previewPanel);
+					addBagLine(constraints, 0, 1, p, "Index", clipboardIndexBox);
 					
 					if (!promptOpenFlag) {
 						promptOpenFlag = true;
 						new Thread(() -> {
 							while (promptOpenFlag) {
 								previewPanel.repaint();
-								try { Thread.sleep(10); } catch (Exception exc) {}
+								try { Thread.sleep(100); } catch (Exception exc) {}
 							}
 						}).start();
 						
@@ -346,16 +268,16 @@ public class ClipboardWidget extends AbstractWidget {
 							promptOpenFlag = false;
 						}
 					}
-				}) // load
-			)
+				}) // Load
+			) // File
 		);
 		
 		menuBar.add(
-			menu("Options", 
-				item("Exit", (action) -> {
-					widget.close();
-				}) // exit
-			)
+			menu("Options"//,
+//				item("Exit", (action) -> { // deprecated for widget hub
+//					widget.close();
+//				}) // exit
+			) // Options
 		);
 		
 		return menuBar;
@@ -387,70 +309,5 @@ public class ClipboardWidget extends AbstractWidget {
 		constraints.gridy = y;
 		constraints.gridx = x;
 		panel.add(component, constraints);
-	}
-}
-
-class SavableClipboard implements Transferable {
-	String text;
-	Image img;
-	List<File> files;
-	
-	private SavableClipboard(String text, Image img, List<File> files) {
-		this.text = text;
-		this.img = img;
-		this.files = files;
-	}
-	
-	@Override
-	public DataFlavor[] getTransferDataFlavors() {
-		return new DataFlavor[] {DataFlavor.imageFlavor, DataFlavor.stringFlavor, DataFlavor.javaFileListFlavor};
-	}
-	
-	@Override
-	public boolean isDataFlavorSupported(DataFlavor flavor) {
-		return DataFlavor.imageFlavor.equals(flavor);
-	}
-	
-	@Override
-	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-		if (flavor.equals(DataFlavor.imageFlavor))
-			return img;
-		else if (flavor.equals(DataFlavor.stringFlavor))
-			return text;
-		else if (flavor.equals(DataFlavor.javaFileListFlavor))
-			return files;
-		else
-			throw new UnsupportedFlavorException(flavor);
-	}
-	
-	static class Builder {
-		private String text = null;
-		private Image img = null;
-		private List<File> files = null;
-		
-		public Builder() {
-			text = null;
-			img = null;
-			files = null;
-		}
-		
-		public Builder setText(String text) {
-			this.text = text;
-			return this;
-		}
-		
-		public Builder setImage(Image img) {
-			this.img = img;
-			return this;
-		}
-		
-		public Builder setFiles(List<File> files) {
-			this.files = files;
-			return this;
-		}
-		
-		public SavableClipboard instantiate() {
-			return new SavableClipboard(text, img, files);
-		}
 	}
 }

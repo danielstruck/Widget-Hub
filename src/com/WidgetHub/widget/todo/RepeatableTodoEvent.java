@@ -1,7 +1,6 @@
 package com.WidgetHub.widget.todo;
 
 import java.awt.Component;
-import java.io.BufferedReader;
 import java.time.DayOfWeek;
 
 import javax.swing.JCheckBox;
@@ -11,7 +10,11 @@ import javax.swing.JOptionPane;
 import com.WidgetHub.widget.ContextMenu;
 
 public class RepeatableTodoEvent extends TodoEvent {
-	private boolean[] repeats;
+	private static final long serialVersionUID = 1L;
+	
+	
+	private boolean[] repeats = new boolean[7];
+	
 	
 	protected class RepeatableTodoEventEditPane extends TodoEventEditPane {
 		private static final long serialVersionUID = 1L;
@@ -48,29 +51,11 @@ public class RepeatableTodoEvent extends TodoEvent {
 	
 	public RepeatableTodoEvent(TodoWidget widget) {
 		super(widget);
-		
-		repeats = new boolean[7];
 	}
 	
 	
 	public void edit() {
-		RepeatableTodoEventEditPane gridPane = new RepeatableTodoEventEditPane(this);
-		gridPane.showConfirmDialog(widget);
-	}
-	
-	
-	public RepeatableTodoEvent(TodoWidget widget, BufferedReader reader) {
-		super(widget, reader);
-		
-		repeats = new boolean[7];
-		
-		try {
-			String repeatData = reader.readLine();
-			for (int i = 0; i < repeats.length; i++)
-				repeats[i] = repeatData.charAt(i) == '+';
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		new RepeatableTodoEventEditPane(this).showConfirmDialog(widget);
 	}
 	
 
@@ -94,19 +79,5 @@ public class RepeatableTodoEvent extends TodoEvent {
 	
 	private boolean repeatsOnDay(DayOfWeek day) {
 		return repeats[day.getValue() - 1];
-	}
-	
-	
-	@Override
-	public String data() {
-		String tor = getClass().getSimpleName() + "\n";
-		
-		tor += super.data();
-		
-		for (boolean day: repeats)
-			tor += day? "+": "_";
-		tor += "\n";
-		
-		return tor;
 	}
 }
