@@ -64,13 +64,16 @@ public class Waveform {
 		return amplified;
 	}
 	
-	public void setVolume(double volume) {
-		if (volume >= 1)
+	public void setVolume(double vol) {
+		if (vol >= 1)
 			volume = 127;
-		else if (volume <= 0)
+		else if (vol <= 0)
 			volume = 0;
 		else
-			volume = (byte) (127 * volume);
+			volume = (byte) (127 * vol);
+	}
+	public int getVolume() {
+		return volume;
 	}
 	
 	

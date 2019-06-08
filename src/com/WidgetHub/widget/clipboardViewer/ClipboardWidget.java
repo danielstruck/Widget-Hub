@@ -40,7 +40,7 @@ public class ClipboardWidget extends AbstractWidget {
 	
 	// constructor info
 	private static final boolean isTransparent = true;
-	private static final int updateDelay = 100;
+	private static final int updateDelay = 1000/60; // 60 FPS
 	private static final String iconPath = null; // TODO make clipboard widget icon
 	
 	// instance variables
@@ -55,7 +55,7 @@ public class ClipboardWidget extends AbstractWidget {
 	
 	public ClipboardWidget() {
 		super(isTransparent, updateDelay, iconPath);
-
+		
 		clipboards = new ArrayList<SavableClipboard>();
 		infoHeight = 0;
 		scroll = 0;
@@ -95,18 +95,26 @@ public class ClipboardWidget extends AbstractWidget {
 						int index = e.getKeyChar() - '0';
 						
 						if (index < clipboards.size()) {
-							SavableClipboard clip = clipboards.get(index);
-							Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clip, null);
+							Macro.load(clipboards, index);
 						}
 						else {
-							Note.playSinNotes(75, "A4");
+							Note.D5.getSquare().setVolume(.5);
+							Note.D5.playSquare(50);
+						}
+					break;
+					case KeyEvent.VK_S:
+						if ((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0) {
+							Macro.save(clipboards, data);
+							Note.A4.getSin().setVolume(.5);
+							Note.B4.getSin().setVolume(.5);
+							Note.playSinNotes(50, "A4 B4");
 						}
 					break;
 				}
 			}
 		});
 		
-		setJMenuBar(menubar(this));
+		setJMenuBar(menubar());
 		setTitle("Clipboard Widget");
 		setBackground(new Color(80, 80, 80));
 		setSize(450, 500);
@@ -150,46 +158,58 @@ public class ClipboardWidget extends AbstractWidget {
 	}
 	
 	
-	public JMenuBar menubar(JFrame frame) {
-		ClipboardWidget widget = this;
+	private static class Macro {
+		private static void edit(JFrame frame) {
+			JOptionPane.showMessageDialog(frame, "Edit tool has been disabled due to bugs.");
+			
+//			try {
+//				if (stringFlavor) {
+//					String input = JOptionPane.showInputDialog(frame, "Change clipboard contents", ClipboardData.clipboard.getData(DataFlavor.stringFlavor));
+//					
+//					if (input != null) {
+//						StringSelection str = new StringSelection(input);
+//						ClipboardData.clipboard.setContents(str, str);
+//					}
+//					else {
+//						JOptionPane.showMessageDialog(frame, "Clipboard edit canceled");
+//					}
+//				}
+//				if (imageFlavor) {
+//					JOptionPane.showMessageDialog(frame, "Image editing unimplemented");
+//				}
+//				if (javaFileListFlavor) {
+//					JOptionPane.showMessageDialog(frame, "File editing unimplemented");
+//				}
+//				else {
+//					JOptionPane.showMessageDialog(frame, "Clipboard data type is unrecognized: ");// + lastDataType.getClass().getName());
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+		}
 		
+		private static void save(ArrayList<SavableClipboard> clipboards, ClipboardData<?> data[]) {
+			clipboards.add(new SavableClipboard(data));
+		}
+		
+		private static void load(ArrayList<SavableClipboard> clipboards, int index) {
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboards.get(index), null);
+		}
+	}
+	public JMenuBar menubar() {
 		JMenuBar menuBar = new JMenuBar();
 		
 		menuBar.add(
 			menu("File", 
 				item("Edit", (action) -> {
-					JOptionPane.showMessageDialog(frame, "Edit tool has been disabled due to bugs.");
-//					try {
-//						if (stringFlavor) {
-//							String input = JOptionPane.showInputDialog(frame, "Change clipboard contents", ClipboardData.clipboard.getData(DataFlavor.stringFlavor));
-//							
-//							if (input != null) {
-//								StringSelection str = new StringSelection(input);
-//								ClipboardData.clipboard.setContents(str, str);
-//							}
-//							else {
-//								JOptionPane.showMessageDialog(frame, "Clipboard edit canceled");
-//							}
-//						}
-//						if (imageFlavor) {
-//							JOptionPane.showMessageDialog(frame, "Image editing unimplemented");
-//						}
-//						if (javaFileListFlavor) {
-//							JOptionPane.showMessageDialog(frame, "File editing unimplemented");
-//						}
-//						else {
-//							JOptionPane.showMessageDialog(frame, "Clipboard data type is unrecognized: ");// + lastDataType.getClass().getName());
-//						}
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
+					Macro.edit(this);
 				}), // Edit
 				item("Save", (action) -> {
-					clipboards.add(new SavableClipboard(data));
+					Macro.save(clipboards, data);
 				}), // Save
 				item("Load", (action) -> {
 					if (clipboards.size() == 0) {
-						JOptionPane.showMessageDialog(widget, "No cliboards saved.");
+						JOptionPane.showMessageDialog(this, "No cliboards saved.");
 						return;
 					}
 					
@@ -257,10 +277,8 @@ public class ClipboardWidget extends AbstractWidget {
 							}
 						}).start();
 						
-						if (JOptionPane.showConfirmDialog(widget, p, "Clipboard Selector", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-							SavableClipboard clip = clipboards.get(clipboardIndexBox.getSelectedIndex());
-							
-							Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clip, null);
+						if (JOptionPane.showConfirmDialog(this, p, "Clipboard Selector", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							Macro.load(clipboards, clipboardIndexBox.getSelectedIndex());
 							
 							promptOpenFlag = false;
 						}

@@ -1,9 +1,11 @@
 package com.WidgetHub.widget.hub;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -13,6 +15,7 @@ import com.WidgetHub.widget.BagGridPane;
 import com.WidgetHub.widget.clipboardViewer.ClipboardWidget;
 import com.WidgetHub.widget.clock.ClockWidget;
 import com.WidgetHub.widget.fractal.FractalWidget;
+import com.WidgetHub.widget.magnifier.MagnifierWidget;
 import com.WidgetHub.widget.memory.MemoryGameWidget;
 import com.WidgetHub.widget.timer.TimerWidget;
 import com.WidgetHub.widget.todo.TodoWidget;
@@ -31,14 +34,15 @@ public class WidgetHub extends AbstractWidget {
 	private static final int updateDelay = 250;
 	private static final String iconPath = null; // TODO make widget hub icon
 	
-	// TODO concatenate widget JFrames together to make 1 JFrame
+	// TODO combine widget JFrames together to make 1 JFrame
 	// instance variables
-	private WidgetCheckBox<ClipboardWidget> clipboardCheckBox;
-	private WidgetCheckBox<ClockWidget> clockCheckBox;
-	private WidgetCheckBox<FractalWidget> fractalCheckBox;
-	private WidgetCheckBox<MemoryGameWidget> memoryCheckBox;
-	private WidgetCheckBox<TimerWidget> timeCheckBox;
-	private WidgetCheckBox<TodoWidget> todoCheckBox;
+//	private WidgetCheckBox<ClipboardWidget> clipboardCheckBox;
+//	private WidgetCheckBox<ClockWidget> clockCheckBox;
+//	private WidgetCheckBox<FractalWidget> fractalCheckBox;
+//	private WidgetCheckBox<MemoryGameWidget> memoryCheckBox;
+//	private WidgetCheckBox<TimerWidget> timeCheckBox;
+//	private WidgetCheckBox<TodoWidget> todoCheckBox;
+	private ArrayList<WidgetCheckBox<? extends AbstractWidget>> checkBoxes;
 	
 
 	public WidgetHub() {
@@ -47,25 +51,36 @@ public class WidgetHub extends AbstractWidget {
 		setTitle("Widget Hub");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		 // TODO Widgets sometimes open twice
-		clipboardCheckBox = new WidgetCheckBox<ClipboardWidget>(ClipboardWidget.class);
-		clockCheckBox	  = new WidgetCheckBox<ClockWidget>(ClockWidget.class); // TODO ClockWidget sometimes fails to open properly when another widget is open first
-		fractalCheckBox	  = new WidgetCheckBox<FractalWidget>(FractalWidget.class);
-		memoryCheckBox	  = new WidgetCheckBox<MemoryGameWidget>(MemoryGameWidget.class);
-		timeCheckBox	  = new WidgetCheckBox<TimerWidget>(TimerWidget.class);
-		todoCheckBox	  = new WidgetCheckBox<TodoWidget>(TodoWidget.class);
+//		clipboardCheckBox = new WidgetCheckBox<ClipboardWidget>(ClipboardWidget.class);
+//		clockCheckBox	  = new WidgetCheckBox<ClockWidget>(ClockWidget.class);
+//		fractalCheckBox	  = new WidgetCheckBox<FractalWidget>(FractalWidget.class);
+//		memoryCheckBox	  = new WidgetCheckBox<MemoryGameWidget>(MemoryGameWidget.class);
+//		timeCheckBox	  = new WidgetCheckBox<TimerWidget>(TimerWidget.class);
+//		todoCheckBox	  = new WidgetCheckBox<TodoWidget>(TodoWidget.class);
+		checkBoxes = new ArrayList<WidgetCheckBox<? extends AbstractWidget>>();
+		checkBoxes.add(new WidgetCheckBox<ClipboardWidget>(ClipboardWidget.class));
+		checkBoxes.add(new WidgetCheckBox<ClockWidget>(ClockWidget.class));
+		checkBoxes.add(new WidgetCheckBox<FractalWidget>(FractalWidget.class));
+		checkBoxes.add(new WidgetCheckBox<MagnifierWidget>(MagnifierWidget.class));
+		checkBoxes.add(new WidgetCheckBox<MemoryGameWidget>(MemoryGameWidget.class));
+		checkBoxes.add(new WidgetCheckBox<TimerWidget>(TimerWidget.class));
+		checkBoxes.add(new WidgetCheckBox<TodoWidget>(TodoWidget.class));
 		
 		BagGridPane gridPane = new BagGridPane();
-		gridPane.addRow(clipboardCheckBox);
-		gridPane.addRow(clockCheckBox);
-		gridPane.addRow(fractalCheckBox);
-		gridPane.addRow(memoryCheckBox);
-		gridPane.addRow(timeCheckBox);
-		gridPane.addRow(todoCheckBox);
+//		gridPane.addRow(clipboardCheckBox);
+//		gridPane.addRow(clockCheckBox);
+//		gridPane.addRow(fractalCheckBox);
+//		gridPane.addRow(memoryCheckBox);
+//		gridPane.addRow(timeCheckBox);
+//		gridPane.addRow(todoCheckBox);
+		for (WidgetCheckBox<? extends AbstractWidget> checkBox: checkBoxes)
+			gridPane.addRow(checkBox);
 		
 		panel.add(gridPane, BorderLayout.NORTH);
 		pack();
-		setSize(Math.max(250, getWidth()), getHeight());
+		Dimension size = new Dimension(Math.max(250, getWidth()), getHeight());
+		setMinimumSize(size);
+		setSize(size);
 	}
 	
 	
